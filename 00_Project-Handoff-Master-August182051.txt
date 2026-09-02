@@ -1,0 +1,217 @@
+Subfolders include:
+
+01_Product-and-Planning/
+Contains:
+
+technical blueprint
+implementation backlog
+database schema draft
+API endpoint planning
+02_Architecture-and-Stack/
+Contains:
+
+Laravel starter architecture
+service skeletons
+file stubs
+possibly additional Laravel stub planning files
+03_Codex-Build-System/
+Contains:
+
+Codex-oriented build guidance
+starter pack
+Codex prompt master
+may contain archived or transitional prompt artifacts if not fully cleaned up yet
+04_Deployment-and-Ops/
+Contains:
+
+Laravel deployment checklist
+05_Prototype-Assets/
+Contains:
+
+logos/
+screenshots/
+brand/
+notes/
+06_Static-Prototype/
+Contains:
+
+current/ for the active prototype
+review-snapshots/ for milestone copies
+notes/ for review comments and decisions
+90_Exports/
+Contains:
+
+Word/PDF exports
+99_Archive/
+Contains:
+
+superseded docs
+old prompts
+draft fragments
+deprecated exports
+Current Prototype Scope
+The static prototype should cover these pages:
+
+index.html
+dashboard.html
+teams.html
+team-detail.html
+create-team.html
+player-identity.html
+guardian-relationships.html
+This prototype is:
+
+static HTML/CSS/minimal JS
+desktop-first
+intended for Cloudflare Pages or simple static hosting
+not dependent on backend functionality
+not intended to simulate all production behaviors
+Current Prototype Quality Goals
+The prototype should demonstrate:
+
+strong product hierarchy
+visible Bulldog brand alignment
+desktop confidence
+readable tables/forms/cards
+credible navigation
+a clear app shell/sidebar/header system
+serious and restrained software feel
+internal consistency across pages
+Most importantly:
+
+team-detail.html must be the strongest page
+It should feel like:
+
+the operational heart of the product
+the place where overview, roster, roles, and actions come together
+the page that makes the product concept “click”
+Current Brand Direction
+The prototype should feel like a software extension of bulldogstats.com.
+
+It should use:
+
+dark/navy primary framing
+Bulldog green as accent/action color
+clean neutrals
+strong contrast
+confident headings
+restrained logo usage
+serious, premium-but-practical product styling
+It should avoid:
+
+generic starter dashboard feel
+random placeholder colors
+fake mascot art
+clip-art
+collage-style screenshots in the UI
+overly playful visual treatment
+Screenshots from bulldogstats.com are reference material, not decorative page content.
+
+Current Asset Policy
+If official Bulldog logo/wordmark assets exist:
+
+use them carefully
+preserve proportions
+avoid distortion or improvised recoloring
+If official assets do not exist:
+
+use restrained text-based brand treatment instead
+Do not:
+
+invent logos
+use AI-generated mascot replacements
+use generic sports clip-art
+Assets belong in:
+
+05_Prototype-Assets/logos/
+05_Prototype-Assets/screenshots/
+05_Prototype-Assets/brand/
+05_Prototype-Assets/notes/
+Current Acceptance Standard
+The prototype is considered successful when it is strong enough for confident product review, not necessarily production completeness.
+
+The key acceptance questions are:
+
+Does this feel like Bulldog?
+Does this feel like a real product rather than a concept sketch?
+Does the desktop experience feel credible?
+Does the team-detail page make the product make sense?
+Would this help guide real Laravel implementation later?
+If the answer is yes to those questions, the prototype is likely in good shape.
+
+What Has Been Decided
+The following project decisions have effectively been made during the recent work:
+
+Documentation decisions
+Keep the most active prototype guidance at the root
+keep exports and archive material out of the active path where possible
+organize docs in numbered folders for clarity and retrieval
+Prototype decisions
+prioritize static prototype over immediate backend implementation
+build desktop-first
+keep JS minimal
+emphasize structure, hierarchy, and brand confidence
+focus heavily on team-detail page quality
+Brand decisions
+align with bulldogstats.com
+use real assets if available
+prefer text-based fallbacks over fake imagery
+keep design restrained and serious
+Implementation planning decisions
+use the static prototype to reduce ambiguity before Laravel build-out
+use the prototype files and styles as directional input for later Blade/component work
+avoid introducing unnecessary technical complexity during the prototype phase
+What Still Remains To Be Done
+The following items may still be pending depending on current folder contents:
+
+1. Final cleanup
+archive duplicate .txt working files if they still exist
+move old prompt fragments to 99_Archive/
+consolidate Word exports into 90_Exports/word/ if desired
+2. Asset placement
+add official Bulldog logo files if available
+add reference screenshots to 05_Prototype-Assets/screenshots/
+3. Prototype refinement
+confirm all prototype pages exist in 06_Static-Prototype/current/
+refine styling so the app no longer feels generic
+ensure team-detail.html is clearly the best page
+4. Review readiness
+compare the prototype against:
+00_Prototype-Review-Checklist.md
+26_Static-Prototype-Acceptance-Criteria.md
+5. Future implementation preparation
+later map prototype modules into Laravel Blade/components/layout structure
+translate prototype design system into reusable application patterns
+Recommended Review Order For A New Chat
+If another chat needs to get up to speed efficiently, review in this order:
+
+First pass
+00_Project-Handoff-Master.md
+00_Document-Priority-and-Source-of-Truth.md
+00_Prototype-Scope-and-UX-Goals.md
+00_Brand-and-Visual-Reference.md
+Second pass
+23_Static-Prototype-Prompt-Master.md
+24_Static-Prototype-File-Map.md
+25_Static-Prototype-Sample-Content.md
+26_Static-Prototype-Acceptance-Criteria.md
+Third pass
+01_Product-and-Planning/
+02_Architecture-and-Stack/
+03_Codex-Build-System/
+06_Static-Prototype/current/
+Recommended Instruction To Another Chat
+A good handoff instruction to another chat would be:
+
+Use 00_Project-Handoff-Master.md as the primary orientation file. Then use 00_Document-Priority-and-Source-of-Truth.md to understand precedence. The current active phase is a desktop-first static prototype aligned to bulldogstats.com. The most important prototype files are 23_Static-Prototype-Prompt-Master.md, 24_Static-Prototype-File-Map.md, 25_Static-Prototype-Sample-Content.md, and 26_Static-Prototype-Acceptance-Criteria.md. Treat team-detail.html as the hero working page and optimize for credible product review rather than backend completeness.
+
+Short Summary
+Bulldog Statbook has moved from fragmented planning notes into a structured documentation and static prototype system.
+
+The current priority is a branded, credible, desktop-first static prototype that:
+
+feels like Bulldog
+feels like a serious software product
+supports stakeholder review
+makes the team-detail page the center of the experience
+prepares the way for later Laravel implementation

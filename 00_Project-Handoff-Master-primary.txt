@@ -1,0 +1,264 @@
+# Bulldog Statbook Project Handoff Master
+
+Version: v1.0    
+Last Updated: 2026-08-18    
+Status: Active    
+Document Type: Master Handoff / Current State Summary    
+Priority: Highest    
+Audience:  
+- Codex  
+- implementation assistants  
+- future project chats  
+- stakeholders needing orientation
+
+Related Documents:  
+- `00_README-Statbook-Data-Architecture.md`  
+- `00_Document-Priority-and-Source-of-Truth.md`  
+- `00_Prototype-Scope-and-UX-Goals.md`  
+- `00_Brand-and-Visual-Reference.md`  
+- `00_Prototype-Asset-Usage-Guide.md`  
+- `00_Prototype-Review-Checklist.md`  
+- `00_Prototype-Task-Definition.md`  
+- `23_Static-Prototype-Prompt-Master.md`  
+- `24_Static-Prototype-File-Map.md`  
+- `25_Static-Prototype-Sample-Content.md`  
+- `26_Static-Prototype-Acceptance-Criteria.md`
+
+---
+
+## Purpose
+
+This document is a single-file handoff summary intended to bring a new chat, assistant, or contributor up to speed quickly on the current state of the Bulldog Statbook project.
+
+It summarizes what has been created since the earlier planning phase and especially since the point referred to as **“Group 6 preliminary lock candidates.”**
+
+This file should be used as the fastest orientation document before diving into the more specific source files.
+
+---
+
+## Executive Summary
+
+The Bulldog Statbook project has progressed from early data architecture and Laravel planning into a much more structured **static prototype phase**.
+
+A dedicated `Statbook-Data-Architecture` repository/folder structure has now been organized with:
+
+1. top-level governance files    
+2. product/planning documents    
+3. Laravel architecture documents    
+4. Codex build-guidance documents    
+5. deployment notes    
+6. prototype asset folders    
+7. a current static prototype folder    
+8. archive/export locations  
+
+The current focus is not backend implementation yet.
+
+The current focus is:
+
+- creating a **desktop-first static HTML/CSS/JS prototype**  
+- aligning visual direction with **bulldogstats.com**  
+- making the UI feel like a **real product**, not a generic admin template  
+- making **team-detail.html** the central “working page”  
+- preparing a prototype that is strong enough for review and later Laravel implementation planning
+
+---
+
+## What Has Been Created
+
+### 1. A structured documentation system
+
+The project now has a cleaner numbered document structure, including:
+
+- root-level governance / orientation docs  
+- product and planning docs  
+- architecture and Laravel docs  
+- Codex-specific build docs  
+- deployment docs  
+- prototype-specific prompt, file map, sample content, and acceptance criteria
+
+This is intended to make machine retrieval and human navigation easier.
+
+---
+
+### 2. A prototype governance layer
+
+A complete static prototype support layer has been created, including:
+
+- `00_Prototype-Scope-and-UX-Goals.md`  
+- `00_Brand-and-Visual-Reference.md`  
+- `00_Prototype-Asset-Usage-Guide.md`  
+- `00_Prototype-Review-Checklist.md`  
+- `00_Prototype-Task-Definition.md`  
+- `23_Static-Prototype-Prompt-Master.md`  
+- `24_Static-Prototype-File-Map.md`  
+- `25_Static-Prototype-Sample-Content.md`  
+- `26_Static-Prototype-Acceptance-Criteria.md`
+
+These collectively define:  
+- what the prototype is  
+- what it should feel like  
+- which pages must exist  
+- what content should appear  
+- how it should be reviewed  
+- how acceptance should be judged
+
+---
+
+### 3. A formalized folder structure
+
+The `Statbook-Data-Architecture` directory has been organized into a predictable structure with numbered folders for:
+
+- planning  
+- architecture  
+- build guidance  
+- deployment  
+- assets  
+- static prototype  
+- exports  
+- archive
+
+This helps reduce clutter and improves Codex retrieval.
+
+---
+
+### 4. A working static prototype directory
+
+A prototype structure now exists at:
+
+`06_Static-Prototype/current/`
+
+Expected prototype files include:
+
+- `index.html`  
+- `dashboard.html`  
+- `teams.html`  
+- `team-detail.html`  
+- `create-team.html`  
+- `player-identity.html`  
+- `guardian-relationships.html`  
+- `styles.css`  
+- `app.js`
+
+This prototype is intended to remain static and lightweight for the review phase.
+
+---
+
+### 5. A brand-aligned visual direction
+
+The prototype direction has been refined to align more closely with **bulldogstats.com**.
+
+The visual intent is now clearly documented as:
+
+- dark/navy foundation  
+- Bulldog green accents/actions  
+- bold, confident headings  
+- restrained, serious product styling  
+- desktop-first composition  
+- product UI rather than marketing-site layout  
+- no generic admin-template feel  
+- no fake mascot graphics or clip-art
+
+---
+
+## Current Project Phase
+
+The project is currently in:
+
+## Static Prototype Design and Review Preparation
+
+This phase is focused on producing a static, reviewable front-end prototype that is strong enough to support:
+
+- stakeholder review  
+- UX and hierarchy evaluation  
+- visual direction approval  
+- later Laravel implementation planning
+
+This is **not yet** the full Laravel implementation phase.
+
+---
+
+## Current Strategic Goal
+
+The immediate strategic goal is:
+
+> Create a credible, branded, desktop-first Bulldog Statbook static prototype in which `team-detail.html` feels like the operational center of the product.
+
+That is the core of the current effort.
+
+---
+
+## Most Important Current Files
+
+If a new chat or assistant only reads a subset of files first, the recommended priority is:
+
+1. `00_Project-Handoff-Master.md`    
+2. `00_Document-Priority-and-Source-of-Truth.md`    
+3. `00_Prototype-Scope-and-UX-Goals.md`    
+4. `00_Brand-and-Visual-Reference.md`    
+5. `23_Static-Prototype-Prompt-Master.md`    
+6. `24_Static-Prototype-File-Map.md`    
+7. `25_Static-Prototype-Sample-Content.md`    
+8. `26_Static-Prototype-Acceptance-Criteria.md`  
+
+These provide the most important current context.
+
+---
+
+## Current Source-of-Truth Model
+
+The project now distinguishes between several layers of truth:
+
+### 1. Product truth  
+Defined in:  
+- `01_Product-and-Planning/`  
+- especially the blueprint, backlog, schema, and endpoint planning docs
+
+### 2. Architecture truth  
+Defined in:  
+- `02_Architecture-and-Stack/`
+
+### 3. Codex execution truth  
+Defined in:  
+- `03_Codex-Build-System/`
+
+### 4. Static prototype truth  
+Defined in the top-level prototype governance files and in:  
+- `06_Static-Prototype/current/`
+
+### 5. Brand and visual truth  
+Defined in:  
+- `00_Brand-and-Visual-Reference.md`  
+- `00_Prototype-Asset-Usage-Guide.md`  
+- `05_Prototype-Assets/`
+
+When conflicts arise, newer and more explicit prototype governance files should guide the current static prototype phase.
+
+---
+
+## Current Folder Structure
+
+The current intended structure is:
+
+```text  
+Statbook-Data-Architecture/  
+│  
+├── 00_README-Statbook-Data-Architecture.md  
+├── 00_Document-Priority-and-Source-of-Truth.md  
+├── 00_Prototype-Scope-and-UX-Goals.md  
+├── 00_Brand-and-Visual-Reference.md  
+├── 00_Prototype-Asset-Usage-Guide.md  
+├── 00_Prototype-Review-Checklist.md  
+├── 00_Prototype-Task-Definition.md  
+├── 23_Static-Prototype-Prompt-Master.md  
+├── 24_Static-Prototype-File-Map.md  
+├── 25_Static-Prototype-Sample-Content.md  
+├── 26_Static-Prototype-Acceptance-Criteria.md  
+│  
+├── 01_Product-and-Planning/  
+├── 02_Architecture-and-Stack/  
+├── 03_Codex-Build-System/  
+├── 04_Deployment-and-Ops/  
+├── 05_Prototype-Assets/  
+├── 06_Static-Prototype/  
+├── 90_Exports/  
+└── 99_Archive/  
