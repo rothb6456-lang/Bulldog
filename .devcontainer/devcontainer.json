@@ -1,0 +1,38 @@
+{
+  "name": "Bulldog Statbook Dev Environment",
+  "image": "mcr.microsoft.com/devcontainers/php:1-8.2-bullseye",
+  "features": {
+    "ghcr.io/devcontainers/features/mysql:1": {
+      "version": "8.0",
+      "databaseName": "bulldog_local",
+      "databaseUser": "bulldog_user",
+      "databasePassword": "bulldog_password"
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "lts"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "php.suggest.basic": false,
+        "editor.formatOnSave": true
+      },
+      "extensions": [
+        "onecentlin.laravel5-snippets",
+        "onecentlin.laravel-blade",
+        "amiralibayati.laravel-artisan",
+        "shufo.vscode-blade-formatter",
+        "bmewburn.vscode-intelephense-client"
+      ]
+    }
+  },
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  "forwardPorts": [8000, 3306],
+  "portsAttributes": {
+    "8000": {
+      "label": "Laravel App",
+      "onAutoForward": "openPreview"
+    }
+  }
+}
