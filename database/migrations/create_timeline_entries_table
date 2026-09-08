@@ -1,0 +1,33 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('timeline_entries', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->string('subject_type'); // 'player', 'team'
+            $table->uuid('subject_id')->index();
+
+            $table->string('entry_type');  // 'join_team', 'first_game', 'milestone_reached', 'achievement_earned'
+            $table->timestamp('entry_date');
+            $table->string('title');
+            $table->text('description');
+
+            $table->string('source_type')->default('bulldog_derived');
+            $table->uuid('source_ref_id')->nullable(); // Poly link to milestone, award, or game record
+            $table->string('official_status')->default('official');
+            $table->string('visibility')->default('team'); // 'private', 'team', 'public'
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('timeline_entries');
+    }
+};

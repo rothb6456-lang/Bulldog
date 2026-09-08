@@ -1,13 +1,7 @@
 {
-  "name": "Bulldog Statbook Dev Environment",
+  "name": "Bulldog Statbook Dev Environment (SQLite)",
   "image": "mcr.microsoft.com/devcontainers/php:1-8.2-bullseye",
   "features": {
-    "ghcr.io/devcontainers/features/mysql:1": {
-      "version": "8.0",
-      "databaseName": "bulldog_local",
-      "databaseUser": "bulldog_user",
-      "databasePassword": "bulldog_password"
-    },
     "ghcr.io/devcontainers/features/node:1": {
       "version": "lts"
     }
@@ -28,7 +22,7 @@
     }
   },
   "postCreateCommand": "bash .devcontainer/setup.sh",
-  "forwardPorts": [8000, 3306],
+  "forwardPorts": [8000],
   "portsAttributes": {
     "8000": {
       "label": "Laravel App",
