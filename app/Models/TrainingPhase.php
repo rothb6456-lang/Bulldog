@@ -21,6 +21,7 @@ class TrainingPhase extends Model
         'duration_weeks',
         'sessions_per_week',
         'phase_goal',
+        'status',
         'key_exercises',
         'primary_metrics',
         'secondary_metrics',

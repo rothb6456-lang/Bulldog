@@ -14,6 +14,12 @@ class Exercise extends Model
     protected $fillable = [
         'canonical_name',
         'movement_pattern',
+        'muscle_group',
+        'category',
+        'equipment_type',
+        'is_unilateral',
+        'is_timed',
+        'safety_notes',
         'primary_muscle',
         'secondary_muscles',
         'default_equipment_id',
@@ -27,6 +33,8 @@ class Exercise extends Model
     ];
 
     protected $casts = [
+        'is_unilateral' => 'boolean',
+        'is_timed' => 'boolean',
         'is_time_based' => 'boolean',
         'is_distance_based' => 'boolean',
     ];

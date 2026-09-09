@@ -17,6 +17,8 @@ class PlayerTrainingAssumption extends Model
         'category',
         'description',
         'confidence',
+        'confidence_level',
+        'phase_first_observed',
         'first_observed',
         'last_validated',
         'status',

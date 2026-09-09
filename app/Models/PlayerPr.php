@@ -19,9 +19,11 @@ class PlayerPr extends Model
         'pr_value',
         'pr_unit',
         'pr_date',
+        'phase_number',
         'phase_id',
         'session_id',
         'previous_best',
+        'previous_best_value',
         'previous_best_date',
         'set_details',
         'notes',
@@ -30,6 +32,7 @@ class PlayerPr extends Model
     protected $casts = [
         'pr_value' => 'float',
         'previous_best' => 'float',
+        'previous_best_value' => 'float',
         'pr_date' => 'date',
         'previous_best_date' => 'date',
     ];

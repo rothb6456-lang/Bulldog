@@ -14,6 +14,7 @@ class ExerciseNameMap extends Model
     protected $fillable = [
         'original_name',
         'exercise_id',
+        'canonical_name',
     ];
 
     public function exercise(): BelongsTo

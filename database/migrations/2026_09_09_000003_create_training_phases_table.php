@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('training_phases', function (Blueprint $table) {
@@ -30,17 +27,14 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('player_identity_id')
-                  ->references('id')
-                  ->on('player_identities')
-                  ->cascadeOnDelete();
+                ->references('id')
+                ->on('player_identities')
+                ->cascadeOnDelete();
 
             $table->unique(['player_identity_id', 'phase_number']);
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('training_phases');
