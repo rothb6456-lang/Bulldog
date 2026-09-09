@@ -1,3 +1,5 @@
+<?php
+
 namespace App\Http\Controllers\Api\V1\Training;
 
 use App\Http\Controllers\Controller;
@@ -27,6 +29,12 @@ class CoachController extends Controller
         ]);
 
         $user = $request->user();
+        if (!$user->profile) {
+            return response()->json([
+                'message' => 'A profile is required for cloud coach actions.',
+            ], 403);
+        }
+
         $playerIdentity = $user->playerIdentity;
 
         if (!$playerIdentity) {

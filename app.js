@@ -37,3 +37,8 @@
     button.addEventListener('click', () => window.alert(button.dataset.prototypeNotice));
   });
 })();
+
+const syncScript = document.createElement('script');
+syncScript.src = 'sync.js';
+syncScript.defer = true;
+document.head.appendChild(syncScript);

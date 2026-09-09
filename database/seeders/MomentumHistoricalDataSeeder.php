@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\PlayerIdentity;
 use App\Models\Exercise;
@@ -45,14 +46,27 @@ class MomentumHistoricalDataSeeder extends Seeder
      */
     private function resolveCanonicalPlayerIdentity(): PlayerIdentity
     {
-        $user = User::where('email', 'brian@bulldogstats.com')->first();
+        $user = User::firstOrCreate(
+            ['email' => 'rothb6456@gmail.com'],
+            [
+                'name' => 'Brian Roth',
+                'password' => Hash::make('YourSecureGymPassword123!'),
+                'is_minor' => false,
+                'status' => 'active',
+            ]
+        );
+
+        $user->profile()->updateOrCreate(
+            [],
+            ['display_name' => 'Brian Roth']
+        );
 
         return PlayerIdentity::firstOrCreate(
             ['player_code' => 'PLR-BULLDOG-001'],
             [
-                'user_id' => $user?->id,
+                'user_id' => $user->id,
                 'display_name' => 'Brian (Bulldog Owner)',
-                'claim_status' => $user ? 'claimed' : 'unclaimed',
+                'claim_status' => 'claimed',
             ]
         );
     }
