@@ -53,7 +53,7 @@ class TrainingSession extends Model
 
     public function sets(): HasMany
     {
-        return $this->hasMany(TrainingSet::class, 'session_id');
+        return $this->hasMany(\App\Models\TrainingSet::class, 'session_id');
     }
 
     public function personalRecords(): HasMany
