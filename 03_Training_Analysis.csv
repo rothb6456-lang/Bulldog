@@ -1,0 +1,265 @@
+﻿SectionName,SectionOrder,PhaseID,ExerciseName,PRType,PRValue,PRUnit,PRDate,PreviousBest,PreviousBestDate,SetDetails,Notes,Col_Category,Col_Description,Col_Confidence,Col_Status,Col_Evidence,Col_WeekStart,Col_TotalSets,Col_PullSets,Col_PushSets,Col_LegSets,Col_BicepSets,Col_TricepSets,Col_CoreSets,Col_CarrySets,Col_CardioSets,Col_SessionCount,Col_AvgSetsPerWeek,Col_ProgramDay,Col_WorkoutName,Col_ExType,Col_PrescSets,Col_PrescRepMin,Col_PrescRepMax,Col_WasPerformed,Col_ActualSets,Col_ActualAvgReps,Col_SetCompliance,Col_RepInRange
+PersonalRecords,1,2,Seated Single Arm DB Curl - Anchored,Heaviest Weight,45,lbs,46040,40,46040,5 reps @ 45 lbs Phase 2 peak; transitioned to other curl variations ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+PersonalRecords,1,2,Supine Press Machine - Plate Loaded (Planet Fitness),Heaviest Weight,200,lbs,46056,180,46047,6 reps @ 200 lbs,Phase 2 peak,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+PersonalRecords,1,3,Smith Machine Bench Press,Heaviest Weight,185,lbs,46069,175,46062,5 reps @ 185 lbs,Phase 3; transitioned away from Smith bench,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+PersonalRecords,1,3,Rowing (2K),Best Time,462,seconds,46066,464,46060,7:42 (462 sec) for 2K,Phase 3; 7 min 42 sec ,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+PersonalRecords,1,3,Kneeling Cable Row,Heaviest Weight,150,lbs,46084,145,46043,11 reps @ 150 lbs,Phase 3 peak; transitioned to other row variations,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+PersonalRecords,1,4,Chest Supported DB Row (Spider),Heaviest Weight,75,lbs,46113,70,46101,7 reps @ 75 lbs per hand,Maintained through Phases 5-8,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+PersonalRecords,1,4,Single-Arm Neutral Grip Cable Pulldown,Heaviest Weight,85,lbs,46113,80,46071,10 reps @ 170 lbs,Maintained through Phases 5-8 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+PersonalRecords,1,5,Face Pull,Heaviest Weight,50,lbs,46126,47.5,46234,20 reps @ 50 lbs,Phases 5-8 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+PersonalRecords,1,5,Low-Incline DB Press (15-30°),Heaviest Weight,80,lbs,46147,70,46130,10 reps @ 80 lbs total (40 per hand),Phase 5 peak,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+PersonalRecords,1,5,Incline Dumbell Curl (Supinated,Heaviest Weight,40,lbs,46123,35,46123,6 reps @ 40 lbs per hand alternating,Phase 5 peak,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+PersonalRecords,1,5,Bulgarian Split Squat,Heaviest Weight,50,lbs,46139,45,46233,8 reps @ 50 lbs total (25 per hand),Phase 5 peak load,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+PersonalRecords,1,5,Suitcase Carries,Longest Duration,75,seconds,46136,65,46101,75 sec @ 75 lbs per hand,Phase 5 peak,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+PersonalRecords,1,5,Rope Push-Downs,Heaviest Weight,50,lbs,46132,45,46092,13 reps @ 50 lbs,Maintained through Phases 5-8 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+PersonalRecords,1,6,Half-Kneeling Single Arm Cable Row,Heaviest Weight,67.5,lbs,46179,65,46172,11 reps @ 67.5 lbs,Phase 6 peak,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+PersonalRecords,1,6,Anchored Single Arm Dumbbell Curl,Heaviest Weight,40,lbs,46151,35,46160,4 reps @ 40 lbs Test set; working weight remained at 35 lbs,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+PersonalRecords,1,6,DB Spider Curl (Hammer),Heaviest Weight,35,lbs,46180,15x70,46168,15 reps @ 80 lbs total (40 per hand),Phase 6 peak volume set,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+PersonalRecords,1,6,Farmer's Hold,Longest Duration,80,seconds,46180,70,46150,80 sec @ 150 lbs,Phase 6 peak ,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+PersonalRecords,1,7,Machine Row,Heaviest Weight,210,lbs,46195,207.5,46053,5.5 reps @ 210 lbs,Phase 7 peak; progressive build from 130 lbs in Phase 2 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+PersonalRecords,1,7,Neutral Grip Dumbbell Floor Press,Heaviest Weight,150,lbs,46203,140,46177,6.5 reps @ 150 lbs (75 per hand),Phase 7 overload attempt; primary pressing PR ,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+PersonalRecords,1,7,Plate Pinch,Longest Duration,84,seconds,46203,74,46202,84 sec @ 50 lbs total (25 per hand),Phase 7 peak,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+PersonalRecords,1,7,Dead Hang,Longest Duration,61,seconds,46203,55,46195,61 sec bodyweight,Phase 7 peak,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+PersonalRecords,1,7,Cable Fly (Standing),Heaviest Weight,32.5,lbs,46203,30,46196,12 reps @ 32.5 lbs per side,Phase 7 peak,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+PersonalRecords,1,7,Machine Chest Press,Heaviest Weight,125,lbs,46203,120,46203,9 reps @ 125 lbs,Phase 7 peak,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+PersonalRecords,1,8,Seated Neutral Grip DB Overhead Pres,Heaviest Weight,50,lbs,46231,40,46226,12 reps @ 50 lbs total (25 per hand),Phase 8; OHP reintroduction success ,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+PersonalRecords,1,8,Dumbbell Romanian Deadlift,Heaviest Weight,170,lbs,46233,160,46145,8 reps @ 170 lbs (85 per hand),Phase 8; progressive from 110 in Phase 3 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+PersonalRecords,1,8,Farmer's Walk,Longest Duration,75,seconds,46208,70,46202,75 sec @ 150 lbs at 2 mph 0.5% incline,Phase 8; consistent 150 lbs load ,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+PersonalRecords,1,8,Farmer's Walk,Heaviest Weight,170,lbs,46233,150,46034,55 sec @ 170 lbs (85 per hand),Phase 8 at NXGen gym with heavier DBs ,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+PersonalRecords,1,8,Standing Calf Raise,Heaviest Weight,120,lbs,46233,110,46228,15 reps @ 120 lbs barbell,Phase 8 peak,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+PersonalRecords,1,8,Farmer's Hold,Heaviest Weight,200,lbs,46234,150,46038,49 sec @ 200 lbs (100 per hand),Phase 8 heavy hold attempt ,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+PersonalRecords,1,8,Goblet Squat,Heaviest Weight,80,lbs,46233,75,46228,10 reps @ 80 lbs,Phase 8; introduced in Phase 7 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+PersonalRecords,1,8,High Cable Tricep Pushdown,Heaviest Weight,75,lbs,46228,70,46206,8 reps @ 75 lbs Phase 8 peak ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+PersonalRecords,1,8,Single-Arm Overhead Cable Extension,Heaviest Weight,27.5,lbs,46234,25,46231,10 reps @ 27.5 lbs,Phase 8 peak,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TrainingAssumptions,2,1,,,,,,,,,Fundamental finding that guides all pressing selection,Shoulder,Neutral grip pressing is well tolerated by the right shoulder,High,Active,"Consistent across floor press, DB neutral press, and machine press across all phases",,,,,,,,,,,,,,,,,,,,,,,
+TrainingAssumptions,2,1,,,,,,,,,Not pain but consistent tightness/awareness; worsens with fatigue,Shoulder,"Right anterior shoulder capsule awareness occurs during heavy pressing, especially floor press and machine press eccentric phase",High,Active,Noted in every phase during pressing; more prominent at heavier weights and during eccentric phase,,,,,,,,,,,,,,,,,,,,,,,
+TrainingAssumptions,2,1,,,,,,,,,Primary training limitation alongside shoulder,Grip,"Grip endurance remains a limiting factor on carries, rows, and RDLs",High,Active,"Grip failure occurs before target muscle failure on farmer's walks, chest supported rows, and DB RDLs consistently",,,,,,,,,,,,,,,,,,,,,,,
+TrainingAssumptions,2,1,,,,,,,,,Consistent across all curl variations,Movement Pattern,"Left bicep contraction is slightly weaker than right, especially under fatigue",High,Active,Left contraction fails first on curls; left squeeze less forceful; left resists supination more,,,,,,,,,,,,,,,,,,,,,,,
+TrainingAssumptions,2,1,,,,,,,,,Likely compensation pattern  ,Movement Pattern,"Left trap tends to engage compensatorily during lateral raises, pressing, and overhead movements",Medium,Active,"Left trap shrugging noted during lateral raises, DB press, and overhead press; self-corrected when noticed",,,,,,,,,,,,,,,,,,,,,,,
+TrainingAssumptions,2,1,,,,,,,,,Addressed with paper towels; not a structural limitation,Movement Pattern,Body row grip slips from sweat accumulation during high-volume sessions,Medium,Active,Grip slipping on barbell during body rows when hands are sweaty from prior exercises,,,,,,,,,,,,,,,,,,,,,,,
+TrainingAssumptions,2,2,,,,,,,,,Asymmetric grip failure pattern,Grip,Right grip tends to fail before left on farmer's walks and RDLs,High,Active,Right index finger rolls first; left pinky rolls first; different failure patterns,,,,,,,,,,,,,,,,,,,,,,,
+TrainingAssumptions,2,2,,,,,,,,,Suggests forearm endurance is the root cause rather than finger strength,Grip,Forearm lactic acid buildup precedes finger roll during grip failure,High,Active,Burning sensation in forearms consistently precedes weight rolling to fingertips,,,,,,,,,,,,,,,,,,,,,,,
+TrainingAssumptions,2,3,,,,,,,,,Progressed from zero overhead work to loaded overhead pressing,Shoulder,Overhead pressing tolerance has progressively improved across phases,High,Active,Phase 3: cautious introduction; Phase 6: inverted KB holds; Phase 8: seated neutral grip DB OHP at 50 lbs,,,,,,,,,,,,,,,,,,,,,,,
+TrainingAssumptions,2,3,,,,,,,,,May be related to overall left-side compensation patterns,Shoulder,Cable external rotation: left has less ROM than right,Medium,Active,Noted during cable external rotation warmup in Phase 3,,,,,,,,,,,,,,,,,,,,,,,
+TrainingAssumptions,2,5,,,,,,,,,10-15 degrees of lean back resolves the issue,Shoulder,Slight lean-back on cable pulldowns eliminates right anterior capsule awareness,High,Active,Consistent finding on single arm neutral grip cable pulldowns across Phases 5-8,,,,,,,,,,,,,,,,,,,,,,,
+TrainingAssumptions,2,5,,,,,,,,,Single event but dramatic enough to validate,Recovery,Training on a significant caloric deficit severely impairs performance,High,Active,"Phase 5 Day 1 session with significant caloric deficit resulted in near-illness, carry failure, and early termination",,,,,,,,,,,,,,,,,,,,,,,
+TrainingAssumptions,2,6,,,,,,,,,Corrected by consciously depressing humeral head,Shoulder,Superior humeral glide observed during single arm cable extensions; anchoring down resolves it,Medium,Active,Noted during Phase 6 single arm cable extensions,,,,,,,,,,,,,,,,,,,,,,,
+TrainingAssumptions,2,6,,,,,,,,,Led to tempo re-emphasis in Phase 8 ,Programming,Strict tempo enforcement produces better muscle connection than heavier weight with loose tempo,High,Active,Phase 6 spider curls at lower weight with strict 2-1-3 tempo produced better pump than heavier sets with loose tempo,,,,,,,,,,,,,,,,,,,,,,,
+TrainingAssumptions,2,6,,,,,,,,,May be a useful exercise sequencing insight,Shoulder,Overhead cable extensions seem to loosen the anterior capsule after chest pressing,Medium,Active,Noted in Phase 6 and Phase 7 that capsule feels better after overhead tricep work,,,,,,,,,,,,,,,,,,,,,,,
+TrainingAssumptions,2,6,,,,,,,,,Needs systematic verification; affects all PF cable weight logging ,Equipment,Planet Fitness cable machines may use approximately half the plate weight displayed,Medium,Active,Kneeling single arm rope extension: plate reads 40 but feels like 20 lbs; pattern noted across multiple exercises,,,,,,,,,,,,,,,,,,,,,,,
+TrainingAssumptions,2,7,,,,,,,,,Opposite pattern from farmer's walk (right fails first),Grip,Plate pinch grip: left hand tends to slip before right,Medium,Active,"During plate pinch holds at 50 lbs, left hand consistently loses grip first",,,,,,,,,,,,,,,,,,,,,,,
+TrainingAssumptions,2,7,,,,,,,,,Matches left bicep weakness pattern; suggests left arm is generally weaker,Movement Pattern,Single arm overhead cable extension: left arm fatigues faster than right,High,Active,Left side consistently reaches failure 2-4 reps before right on overhead cable extensions,,,,,,,,,,,,,,,,,,,,,,,
+TrainingAssumptions,2,7,,,,,,,,,Keeping strict 90-100 degree ROM maintains proper form ,Shoulder,High cable tricep pushdown: shoulders roll forward if ROM exceeds 90-100 degrees,Medium,Active,ROM creeping above 90-100 degrees causes shoulder roll-forward compensation,,,,,,,,,,,,,,,,,,,,,,,
+TrainingAssumptions,2,8,,,,,,,,,Effective self-management strategy,Shoulder,Cable fly ROM should be slightly shortened to manage right anterior capsule awareness,Medium,Active,Full cable fly extension triggers right anterior tightness; shortened ROM eliminates it,,,,,,,,,,,,,,,,,,,,,,,
+TrainingAssumptions,2,8,,,,,,,,,Sneeze/puke sensation described; resolves with short rest,Movement Pattern,"Nausea occurs during high-intensity compound movements, especially goblet squats and rowing finishers",Medium,Active,Phase 8 Day 3: nausea after goblet squat set 3; diarrhea after rowing finisher,,,,,,,,,,,,,,,,,,,,,,,
+TrainingAssumptions,2,8,,,,,,,,,Fine-tuning of pressing grip angle,Shoulder,Radial tilt on floor press reduces right anterior capsule awareness,Medium,Active,Shifting to slight radial tilt during neutral grip floor press felt better on capsule,,,,,,,,,,,,,,,,,,,,,,,
+WeeklyVolume,3,1,,,,,,,,,,,,,,,46020,42,7,14,0,6,10,0,5,0,2,21,,,,,,,,,,,
+WeeklyVolume,3,1,,,,,,,,,,,,,,,46027,32,8,0,0,10,8,0,6,0,2,16,,,,,,,,,,,
+WeeklyVolume,3,2,,,,,,,,,,,,,,,46034,82,24,15,0,16,10,0,17,0,5,16.4,,,,,,,,,,,
+WeeklyVolume,3,2,,,,,,,,,,,,,,,46041,85,15,28,0,12,15,1,14,0,5,17,,,,,,,,,,,
+WeeklyVolume,3,2,,,,,,,,,,,,,,,46048,49,19,0,0,10,6,2,12,0,3,16.3,,,,,,,,,,,
+WeeklyVolume,3,3,,,,,,,,,,,,,,,46055,67,11,16,10,12,11,0,6,1,4,16.8,,,,,,,,,,,
+WeeklyVolume,3,3,,,,,,,,,,,,,,,46062,71,11,10,7,12,16,0,14,1,4,17.8,,,,,,,,,,,
+WeeklyVolume,3,3,,,,,,,,,,,,,,,46069,89,10,24,13,10,14,2,5,1,5,17.8,,,,,,,,,,,
+WeeklyVolume,3,3,,,,,,,,,,,,,,,46076,81,9,19,13,7,16,2,7,5,4,20.2,,,,,,,,,,,
+WeeklyVolume,3,3,,,,,,,,,,,,,,,46083,70,12,0,10,10,10,6,15,2,3,23.3,,,,,,,,,,,
+WeeklyVolume,3,3,,,,,,,,,,,,,,,46090,67,14,18,0,9,13,0,11,2,3,22.3,,,,,,,,,,,
+WeeklyVolume,3,4,,,,,,,,,,,,,,,46097,76,17,10,4,12,14,0,9,7,4,19,,,,,,,,,,,
+WeeklyVolume,3,4,,,,,,,,,,,,,,,46104,78,17,10,4,12,15,0,9,5,4,19.5,,,,,,,,,,,
+WeeklyVolume,3,4,,,,,,,,,,,,,,,46111,82,18,12,4,13,16,0,9,4,4,20.5,,,,,,,,,,,
+WeeklyVolume,3,5,,,,,,,,,,,,,,,46139,108,24,12,14,9,14,3,15,9,5,21.6,,,,,,,,,,,
+WeeklyVolume,3,5,,,,,,,,,,,,,,,46132,109,17,12,7,15,21,3,15,10,5,21.8,,,,,,,,,,,
+WeeklyVolume,3,5,,,,,,,,,,,,,,,46125,128,27,22,7,14,21,3,18,7,6,21.3,,,,,,,,,,,
+WeeklyVolume,3,5,,,,,,,,,,,,,,,46118,106,24,10,14,8,15,6,15,6,5,21.2,,,,,,,,,,,
+WeeklyVolume,3,6,,,,,,,,,,,,,,,46146,105,19,22,0,13,17,0,16,9,5,21,,,,,,,,,,,
+WeeklyVolume,3,6,,,,,,,,,,,,,,,46153,36,7,0,0,9,6,0,7,7,2,18,,,,,,,,,,,
+WeeklyVolume,3,6,,,,,,,,,,,,,,,46160,107,22,14,0,19,12,0,21,13,6,17.8,,,,,,,,,,,
+WeeklyVolume,3,6,,,,,,,,,,,,,,,46167,116,22,7,0,21,18,0,21,24,6,19.3,,,,,,,,,,,
+WeeklyVolume,3,6,,,,,,,,,,,,,,,46174,78,13,10,0,13,9,0,14,16,4,19.5,,,,,,,,,,,
+WeeklyVolume,3,7,,,,,,,,,,,,,,,46181,102,7,11,6,14,21,0,37,6,4,25.5,,,,,,,,,,,
+WeeklyVolume,3,7,,,,,,,,,,,,,,,46188,104,7,11,6,15,22,0,37,6,4,26,,,,,,,,,,,
+WeeklyVolume,3,7,,,,,,,,,,,,,,,46195,106,7,11,6,15,24,0,37,6,4,26.5,,,,,,,,,,,
+WeeklyVolume,3,8,,,,,,,,,,,,,,,46202,132,17,12,6,18,24,2,43,10,5,26.4,,,,,,,,,,,
+WeeklyVolume,3,8,,,,,,,,,,,,,,,46209,132,13,29,17,9,21,4,14,25,5,26.4,,,,,,,,,,,
+WeeklyVolume,3,8,,,,,,,,,,,,,,,46216,72,9,0,24,6,10,3,10,10,3,24,,,,,,,,,,,
+WeeklyVolume,3,8,,,,,,,,,,,,,,,46223,113,16,15,15,9,15,4,15,24,4,28.2,,,,,,,,,,,
+WeeklyVolume,3,8,,,,,,,,,,,,,,,46230,113,16,15,15,10,14,4,17,22,4,28.2,,,,,,,,,,,
+Compliance,4,1,Farmer's Walk,,,,,,,,,,,,,,,,,,,,,,,,,,1,Carries + Pull (Strength Bias),Working,5,,,TRUE,5,,100,
+Compliance,4,1,Farmer’s Hold,,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Capacity (The Fun Day),Working,2,,,TRUE,2,,100,
+Compliance,4,1,Single Arm Cable Extensions,,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Capacity (The Fun Day),Working,3,15,20,TRUE,3,19.3,100,In Range
+Compliance,4,1,Dumbbell: Squeeze Curl - Neutral,,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Capacity (The Fun Day),Working,3,15,20,TRUE,3,20,100,In Range
+Compliance,4,1,Cable Push-Downs,,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Capacity (The Fun Day),Working,3,12,15,TRUE,5,9,166.7,Below
+Compliance,4,1,Standing One Arm Extended Cable Curls,,,,,,,,,,,,,,,,,,,,,,,,,,3,Carries + Pull (Volume / Stability),Working,3,10,12,TRUE,4,14,133.3,Above
+Compliance,4,1,Face Pull,,,,,,,,,,,,,,,,,,,,,,,,,,3,Carries + Pull (Volume / Stability),Working,3,12,15,TRUE,4,15,133.3,In Range
+Compliance,4,1,Kneeling Cable Row,,,,,,,,,,,,,,,,,,,,,,,,,,3,Carries + Pull (Volume / Stability),Working,4,8,10,TRUE,4,10,100,In Range
+Compliance,4,1,DB Spider Curl (Hammer),,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Capacity (The Fun Day),Working,3,12,15,TRUE,3,15,100,In Range
+Compliance,4,1,Inverted KB Press,,,,,,,,,,,,,,,,,,,,,,,,,,2,Push + Triceps (Hypertrophy),Working,3,6,8,TRUE,3,8,100,In Range
+Compliance,4,1,"Cable Triceps Extension - ""Quad""",,,,,,,,,,,,,,,,,,,,,,,,,,2,Push + Triceps (Hypertrophy),Working,4,10,12,TRUE,10,7.2,250,Below
+Compliance,4,1,Single-Arm Vertical Plate Balance Press,,,,,,,,,,,,,,,,,,,,,,,,,,2,Push + Triceps (Hypertrophy),Working,3,6,8,TRUE,3,2,100,Below
+Compliance,4,1,Smith Machine Bench Press,,,,,,,,,,,,,,,,,,,,,,,,,,2,Push + Triceps (Hypertrophy),Working,4,8,10,TRUE,4,9.2,100,In Range
+Compliance,4,1,Seated Single Arm DB Curl - Anchored,,,,,,,,,,,,,,,,,,,,,,,,,,1,Carries + Pull (Strength Bias),Working,4,6,8,TRUE,6,5.2,150,Below
+Compliance,4,1,Neutral Grip Seated 2 Arm Row,,,,,,,,,,,,,,,,,,,,,,,,,,1,Carries + Pull (Strength Bias),Working,3,8,10,TRUE,3,10,100,In Range
+Compliance,4,1,Body Row,,,,,,,,,,,,,,,,,,,,,,,,,,1,Carries + Pull (Strength Bias),Working,4,6,8,TRUE,4,8.2,100,Above
+Compliance,4,1,Suitcase Carries,,,,,,,,,,,,,,,,,,,,,,,,,,3,Carries + Pull (Volume / Stability),Working,4,,,TRUE,4,,100,
+Compliance,4,2,Kneeling Cable Row,,,,,,,,,,,,,,,,,,,,,,,,,,3,Carries + Pull (Volume / Stability),Working,4,10,12,TRUE,12,11.2,100,In Range
+Compliance,4,2,Farmer’s Hold,,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Capacity (The Fun Day),Working,3,,,TRUE,12,,100,
+Compliance,4,2,Single Arm Cable Extensions,,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Capacity (The Fun Day),Working,3,15,20,TRUE,9,11.8,100,Below
+Compliance,4,2,Rope Push-Downs,,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Capacity (The Fun Day),Working,3,12,15,TRUE,12,12.3,100,In Range
+Compliance,4,2,DB Spider Curl (Hammer),,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Capacity (The Fun Day),Working,3,12,15,TRUE,14,13.7,116.7,In Range
+Compliance,4,2,Standing One Arm Extended Cable Curls,,,,,,,,,,,,,,,,,,,,,,,,,,3,Carries + Pull (Volume / Stability),Working,3,12,15,TRUE,7,10.1,116.7,Below
+Compliance,4,2,Face Pull,,,,,,,,,,,,,,,,,,,,,,,,,,3,Carries + Pull (Volume / Stability),Working,3,15,20,TRUE,9,19.4,100,In Range
+Compliance,4,2,Suitcase Carries,,,,,,,,,,,,,,,,,,,,,,,,,,3,Carries + Pull (Volume / Stability),Working,4,,,TRUE,13,,108.3,
+Compliance,4,2,Seated Single Arm DB Curl - Anchored,,,,,,,,,,,,,,,,,,,,,,,,,,1,Carries + Pull (Strength Bias),Working,3,8,12,TRUE,18,6,150,Below
+Compliance,4,2,Single-Arm Vertical Plate Balance Press,,,,,,,,,,,,,,,,,,,,,,,,,,2,Push + Triceps (Hypertrophy),Working,3,5,8,TRUE,15,4.2,125,Below
+Compliance,4,2,DB Neutral Press (slight Rotate To Underhand ),,,,,,,,,,,,,,,,,,,,,,,,,,2,Push + Triceps (Hypertrophy),Working,3,8,12,TRUE,16,8,133.3,In Range
+Compliance,4,2,Supine Press Machine - Plate Loaded (Planet Fitness),,,,,,,,,,,,,,,,,,,,,,,,,,2,Push + Triceps (Hypertrophy),Working,4,8,10,TRUE,19,7.2,118.8,Below
+Compliance,4,2,Machine Row,,,,,,,,,,,,,,,,,,,,,,,,,,1,Carries + Pull (Strength Bias),Working,4,6,8,TRUE,9,8.7,112.5,Above
+Compliance,4,2,Body Row,,,,,,,,,,,,,,,,,,,,,,,,,,1,Carries + Pull (Strength Bias),Working,4,6,10,TRUE,16,7,100,In Range
+Compliance,4,2,Farmer's Walk,,,,,,,,,,,,,,,,,,,,,,,,,,1,Carries + Pull (Strength Bias),Working,5,,,TRUE,20,,100,
+Compliance,4,2,"Cable Triceps Extension - ""Quad""",,,,,,,,,,,,,,,,,,,,,,,,,,2,Push + Triceps (Hypertrophy),Working,4,10,15,TRUE,18,14.1,112.5,In Range
+Compliance,4,3,Single-Arm Cable Row (Split Stance),,,,,,,,,,,,,,,,,,,,,,,,,,3,Upper Pull (Strength Bias),Working,2,10,10,TRUE,6,9.5,150,Below
+Compliance,4,3,Rowing,,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Capacity (Low Noise),Capacity,1,,,TRUE,1,,100,
+Compliance,4,3,Farmer’s Hold,,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Capacity (Low Noise),Working,3,,,TRUE,5,,83.3,
+Compliance,4,3,Incline Dumbbell Curl (Supinated),,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Capacity (Low Noise),Working,2,12,12,TRUE,6,11.3,150,Below
+Compliance,4,3,Rope Push-Downs,,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Capacity (Low Noise),Working,3,10,12,TRUE,20,10.4,133.3,In Range
+Compliance,4,3,DB Spider Curl (Hammer),,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Capacity (Low Noise),Working,3,10,12,TRUE,16,9.8,133.3,Below
+Compliance,4,3,Seated Single Arm DB Curl - Anchored,,,,,,,,,,,,,,,,,,,,,,,,,,3,Upper Pull (Strength Bias),Working,2,8,10,TRUE,3,10,150,In Range
+Compliance,4,3,Chest Supported DB Row (Spider),,,,,,,,,,,,,,,,,,,,,,,,,,3,Upper Pull (Strength Bias),Working,4,6,6,TRUE,18,9.7,90,Above
+Compliance,4,3,Single-Arm Neutral Grip Cable Pulldown,,,,,,,,,,,,,,,,,,,,,,,,,,3,Upper Pull (Strength Bias),Working,3,8,8,TRUE,14,9.1,116.7,Above
+Compliance,4,3,Dumbbell Lateral Raise,,,,,,,,,,,,,,,,,,,,,,,,,,2,Upper Push (Strength Bias),Working,3,10,10,TRUE,5,15,83.3,Above
+Compliance,4,3,Smith Machine Bench Press,,,,,,,,,,,,,,,,,,,,,,,,,,2,Upper Push (Strength Bias),Working,3,6,6,TRUE,19,6.6,126.7,Above
+Compliance,4,3,DB Neutral Press (slight Rotate To Underhand ),,,,,,,,,,,,,,,,,,,,,,,,,,2,Upper Push (Strength Bias),Working,3,5,7,TRUE,3,6,100,In Range
+Compliance,4,3,Standing Calf Raise,,,,,,,,,,,,,,,,,,,,,,,,,,1,Lower + Carries (Strength),Working,2,10,12,TRUE,9,12,150,In Range
+Compliance,4,3,Farmer's Walk,,,,,,,,,,,,,,,,,,,,,,,,,,1,Lower + Carries (Strength),Working,3,,,TRUE,3,,100,
+Compliance,4,3,Dumbbell Romanian Deadlift,,,,,,,,,,,,,,,,,,,,,,,,,,1,Lower + Carries (Strength),Working,3,6,6,TRUE,17,7.5,113.3,Above
+Compliance,4,3,Smith Machine Split Squat (rear foot elevated optional),,,,,,,,,,,,,,,,,,,,,,,,,,1,Lower + Carries (Strength),Working,4,5,6,TRUE,12,7.7,75,Above
+Compliance,4,3,Single-Arm Overhead Cable Extension,,,,,,,,,,,,,,,,,,,,,,,,,,2,Upper Push (Strength Bias),Working,2,12,15,TRUE,14,8.6,175,Below
+Compliance,4,4,Seat Cable Row (V / Narrow Neutral Grip),,,,,,,,,,,,,,,,,,,,,,,,,,3,Pull + Stability,Working,3,10,12,TRUE,9,10.3,100,In Range
+Compliance,4,4,Rear Delt Cable Fly,,,,,,,,,,,,,,,,,,,,,,,,,,3,Pull + Stability,Working,3,12,15,TRUE,9,14.9,100,In Range
+Compliance,4,4,Suitcase Carries,,,,,,,,,,,,,,,,,,,,,,,,,,3,Pull + Stability,Working,2,,,TRUE,8,,133.3,
+Compliance,4,4,Incline Dumbbell Curl (Supinated),,,,,,,,,,,,,,,,,,,,,,,,,,3,Pull + Stability,Working,2,10,12,TRUE,6,8.7,100,Below
+Compliance,4,4,Incline Dumbbell Curl (Supinated),,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Capacity,Working,4,8,12,TRUE,12,8.6,100,In Range
+Compliance,4,4,Farmer's Walk,,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Capacity,Working,3,,,TRUE,10,,111.1,
+Compliance,4,4,Rope Push-Downs,,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Capacity,Working,4,10,12,TRUE,12,10.5,100,In Range
+Compliance,4,4,Single Arm Cable Extensions,,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Capacity,Working,3,10,12,TRUE,9,11.1,100,In Range
+Compliance,4,4,Rowing,,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Capacity,Capacity,1,,,TRUE,5,,166.7,
+Compliance,4,4,DB Spider Curl (Hammer),,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Capacity,Working,3,12,15,TRUE,9,14.7,100,In Range
+Compliance,4,4,Single-Arm Neutral Grip Cable Pulldown,,,,,,,,,,,,,,,,,,,,,,,,,,3,Pull + Stability,Working,3,10,10,TRUE,10,9.9,111.1,Below
+Compliance,4,4,Dumbbell Lateral Raise,,,,,,,,,,,,,,,,,,,,,,,,,,2,Push + Triceps (Strength),Working,3,12,15,TRUE,9,12.3,100,In Range
+Compliance,4,4,Rowing,,,,,,,,,,,,,,,,,,,,,,,,,,2,Push + Triceps (Strength),Capacity,1,,,TRUE,4,,133.3,
+Compliance,4,4,Single-Arm Overhead Cable Extension,,,,,,,,,,,,,,,,,,,,,,,,,,2,Push + Triceps (Strength),Working,3,10,12,TRUE,9,10.8,100,In Range
+Compliance,4,4,Rope Push-Downs,,,,,,,,,,,,,,,,,,,,,,,,,,2,Push + Triceps (Strength),Working,4,10,12,TRUE,15,8.1,125,Below
+Compliance,4,4,Single Arm Cable Press,,,,,,,,,,,,,,,,,,,,,,,,,,2,Push + Triceps (Strength),Working,3,10,12,TRUE,10,12.3,111.1,Above
+Compliance,4,4,Smith Machine Bench Press,,,,,,,,,,,,,,,,,,,,,,,,,,2,Push + Triceps (Strength),Working,4,8,10,TRUE,12,7,100,Below
+Compliance,4,4,Rowing,,,,,,,,,,,,,,,,,,,,,,,,,,1,Carries + Pull (Strength),Capacity,1,,,TRUE,3,,100,
+Compliance,4,4,Suitcase Carries,,,,,,,,,,,,,,,,,,,,,,,,,,1,Carries + Pull (Strength),Working,3,,,TRUE,9,,100,
+Compliance,4,4,Incline Dumbbell Curl (Supinated),,,,,,,,,,,,,,,,,,,,,,,,,,1,Carries + Pull (Strength),Working,3,8,10,TRUE,9,8.6,100,In Range
+Compliance,4,4,Face Pull,,,,,,,,,,,,,,,,,,,,,,,,,,1,Carries + Pull (Strength),Working,3,12,15,TRUE,9,20,100,Above
+Compliance,4,4,Dumbbell Romanian Deadlift,,,,,,,,,,,,,,,,,,,,,,,,,,1,Carries + Pull (Strength),Working,4,6,8,TRUE,12,7.6,100,In Range
+Compliance,4,4,Chest Supported DB Row (Spider),,,,,,,,,,,,,,,,,,,,,,,,,,3,Pull + Stability,Working,4,8,10,TRUE,12,8.5,100,In Range
+Compliance,4,5,Rowing,,,,,,,,,,,,,,,,,,,,,,,,,,3,Carries + Pull with Stability Bias,Capacity,1,,,TRUE,7,,175,
+Compliance,4,5,Face Pull,,,,,,,,,,,,,,,,,,,,,,,,,,3,Carries + Pull with Stability Bias,Working,3,15,20,TRUE,18,19.4,100,In Range
+Compliance,4,5,Incline Dumbbell Curl (Supinated),,,,,,,,,,,,,,,,,,,,,,,,,,3,Carries + Pull with Stability Bias,Working,3,8,10,TRUE,17,8.4,94.4,In Range
+Compliance,4,5,Suitcase Holds,,,,,,,,,,,,,,,,,,,,,,,,,,3,Carries + Pull with Stability Bias,Working,3,,,TRUE,18,,100,
+Compliance,4,5,DB Spider Curl (Hammer),,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Capacity,Working,3,12,15,TRUE,18,14.1,100,In Range
+Compliance,4,5,Chest Supported DB Row (Spider),,,,,,,,,,,,,,,,,,,,,,,,,,3,Carries + Pull with Stability Bias,Working,4,10,12,TRUE,24,7.8,100,Below
+Compliance,4,5,Single Arm Cable Extensions,,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Capacity,Working,3,10,12,TRUE,15,11.1,100,In Range
+Compliance,4,5,Incline Dumbbell Curl (Supinated),,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Capacity,Working,3,8,10,TRUE,20,8.9,111.1,In Range
+Compliance,4,5,Dumbbell Lateral Raise,,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Capacity,Working,3,12,15,TRUE,18,14.4,100,In Range
+Compliance,4,5,Farmer’s Hold,,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Capacity,Working,3,,,TRUE,18,,100,
+Compliance,4,5,Rowing,,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Capacity,Capacity,1,,,TRUE,10,,200,
+Compliance,4,5,Rope Push-Downs,,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Capacity,Working,4,10,12,TRUE,24,10.2,100,In Range
+Compliance,4,5,Suitcase Carries,,,,,,,,,,,,,,,,,,,,,,,,,,3,Carries + Pull with Stability Bias,Working,3,,,TRUE,18,,100,
+Compliance,4,5,Single-Arm Neutral Grip Cable Pulldown,,,,,,,,,,,,,,,,,,,,,,,,,,3,Carries + Pull with Stability Bias,Working,3,10,12,TRUE,18,11.3,100,In Range
+Compliance,4,5,Dumbbell Lateral Raise,,,,,,,,,,,,,,,,,,,,,,,,,,2,Push + Triceps with Shoulder Control,Working,3,12,15,TRUE,19,13,105.6,In Range
+Compliance,4,5,Dumbbell Romanian Deadlift,,,,,,,,,,,,,,,,,,,,,,,,,,1,Lower + Pull with Hinge Emphasis,Working,4,6,8,TRUE,24,8,100,In Range
+Compliance,4,5,Bulgarian Split Squat,,,,,,,,,,,,,,,,,,,,,,,,,,1,Lower + Pull with Hinge Emphasis,Working,3,8,8,TRUE,18,8,100,In Range
+Compliance,4,5,Single-Arm Neutral Grip Cable Pulldown,,,,,,,,,,,,,,,,,,,,,,,,,,1,Lower + Pull with Hinge Emphasis,Working,3,10,10,TRUE,18,10.2,100,Above
+Compliance,4,5,Suitcase Carries,,,,,,,,,,,,,,,,,,,,,,,,,,1,Lower + Pull with Hinge Emphasis,Working,3,,,TRUE,18,,100,
+Compliance,4,5,Side Plank,,,,,,,,,,,,,,,,,,,,,,,,,,1,Lower + Pull with Hinge Emphasis,Working,3,,,TRUE,15,,100,
+Compliance,4,5,Rowing,,,,,,,,,,,,,,,,,,,,,,,,,,1,Lower + Pull with Hinge Emphasis,Capacity,1,,,TRUE,10,,200,
+Compliance,4,5,Chest Supported DB Row (Spider),,,,,,,,,,,,,,,,,,,,,,,,,,1,Lower + Pull with Hinge Emphasis,Working,4,8,10,TRUE,24,7.8,100,Below
+Compliance,4,5,Low-Incline DB Press (15–30°),,,,,,,,,,,,,,,,,,,,,,,,,,2,Push + Triceps with Shoulder Control,Working,3,8,10,TRUE,18,10.2,100,Above
+Compliance,4,5,Single-Arm DB Balance Press,,,,,,,,,,,,,,,,,,,,,,,,,,2,Push + Triceps with Shoulder Control,Working,3,6,8,TRUE,18,7.7,100,In Range
+Compliance,4,5,Rope Push-Downs,,,,,,,,,,,,,,,,,,,,,,,,,,2,Push + Triceps with Shoulder Control,Working,4,10,12,TRUE,24,8.5,100,Below
+Compliance,4,5,Rowing,,,,,,,,,,,,,,,,,,,,,,,,,,2,Push + Triceps with Shoulder Control,Capacity,1,,,TRUE,7,,175,
+Compliance,4,5,Single-Arm Cable Triceps Extension (Cross-Body),,,,,,,,,,,,,,,,,,,,,,,,,,2,Push + Triceps with Shoulder Control,Working,3,10,12,TRUE,4,12,133.3,In Range
+Compliance,4,5,DB Neutral Press (slight Rotate To Underhand ),,,,,,,,,,,,,,,,,,,,,,,,,,2,Push + Triceps with Shoulder Control,Working,4,6,8,TRUE,24,7.4,100,In Range
+Compliance,4,6,Face Pull (w External Rotation),,,,,,,,,,,,,,,,,,,,,,,,,,3,Stability Pull + Capacity,Working,3,12,15,TRUE,17,15.7,113.3,Above
+Compliance,4,6,Treadmill Walking,,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Athletic Capacity,Capacity,6,,,TRUE,31,,103.3,
+Compliance,4,6,Farmer’s Hold,,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Athletic Capacity,Working,3,,,TRUE,15,,100,
+Compliance,4,6,Single Arm Cable Extensions,,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Athletic Capacity,Working,3,10,10,TRUE,16,8.6,106.7,Below
+Compliance,4,6,Standing Single Arm Cable Curl,,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Athletic Capacity,Working,3,10,10,TRUE,14,9.5,93.3,Below
+Compliance,4,6,Kneeling Single Arm Rope Cable Extension,,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Athletic Capacity,Working,3,12,15,TRUE,17,10.1,113.3,Below
+Compliance,4,6,DB Spider Curl (Hammer),,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Athletic Capacity,Working,3,12,15,TRUE,15,14.5,100,In Range
+Compliance,4,6,Rowing,,,,,,,,,,,,,,,,,,,,,,,,,,3,Stability Pull + Capacity,Capacity,1,,,TRUE,4,,100,
+Compliance,4,6,Standing One Arm Extended Cable Curls,,,,,,,,,,,,,,,,,,,,,,,,,,3,Stability Pull + Capacity,Working,3,10,12,TRUE,15,11.5,100,In Range
+Compliance,4,6,Half-Kneeling Single Arm Cable Row,,,,,,,,,,,,,,,,,,,,,,,,,,3,Stability Pull + Capacity,Working,4,10,12,TRUE,19,11,95,In Range
+Compliance,4,6,Suitcase Carries,,,,,,,,,,,,,,,,,,,,,,,,,,3,Stability Pull + Capacity,Working,4,,,TRUE,20,,100,
+Compliance,4,6,Body Row,,,,,,,,,,,,,,,,,,,,,,,,,,1,Heavy Pull + Carry,Working,3,6,10,TRUE,15,8,100,In Range
+Compliance,4,6,Inverted KB Hold,,,,,,,,,,,,,,,,,,,,,,,,,,2,Pressing + Triceps,Working,2,,,TRUE,8,,80,
+Compliance,4,6,Single Arm Cable Extensions,,,,,,,,,,,,,,,,,,,,,,,,,,2,Pressing + Triceps,Working,3,10,15,TRUE,15,11,100,In Range
+Compliance,4,6,Cable Lateral Raise (using elbow strap setup),,,,,,,,,,,,,,,,,,,,,,,,,,2,Pressing + Triceps,Working,3,12,15,TRUE,15,13.8,100,In Range
+Compliance,4,6,Single Arm Cable Press (split stance),,,,,,,,,,,,,,,,,,,,,,,,,,2,Pressing + Triceps,Working,3,8,8,TRUE,16,10.8,106.7,Above
+Compliance,4,6,Neutral Grip Dumbbell Floor Press,,,,,,,,,,,,,,,,,,,,,,,,,,2,Pressing + Triceps,Working,4,6,8,TRUE,22,7.2,110,In Range
+Compliance,4,6,Rowing,,,,,,,,,,,,,,,,,,,,,,,,,,1,Heavy Pull + Carry,Capacity,1,,,TRUE,5,,100,
+Compliance,4,6,Anchored Single Arm Dumbbell Curl,,,,,,,,,,,,,,,,,,,,,,,,,,1,Heavy Pull + Carry,Working,3,8,12,TRUE,19,6.8,126.7,Below
+Compliance,4,6,Machine Row,,,,,,,,,,,,,,,,,,,,,,,,,,1,Heavy Pull + Carry,Working,4,6,8,TRUE,22,7.3,110,In Range
+Compliance,4,6,Farmer's Walk,,,,,,,,,,,,,,,,,,,,,,,,,,1,Heavy Pull + Carry,Working,5,,,TRUE,25,,100,
+Compliance,4,6,Vertical DB Scap extension,,,,,,,,,,,,,,,,,,,,,,,,,,2,Pressing + Triceps,Working,1,20,20,TRUE,8,14.1,200,Below
+Compliance,4,7,Endless Rope,,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Capacity + Grip,Capacity,3,,,TRUE,4,,66.7,
+Compliance,4,7,High Cable Tricep Pushdown,,,,,,,,,,,,,,,,,,,,,,,,,,3,Lower Body + Carry Progression + Arm Support,Working,3,10,12,TRUE,14,9.6,116.7,Below
+Compliance,4,7,Walking Lunges,,,,,,,,,,,,,,,,,,,,,,,,,,3,Lower Body + Carry Progression + Arm Support,Working,2,10,10,TRUE,8,,100,
+Compliance,4,7,Farmer's Walk,,,,,,,,,,,,,,,,,,,,,,,,,,3,Lower Body + Carry Progression + Arm Support,Working,5,,,TRUE,20,,100,
+Compliance,4,7,Plate Pinch,,,,,,,,,,,,,,,,,,,,,,,,,,3,Lower Body + Carry Progression + Arm Support,Working,3,,,TRUE,12,,100,
+Compliance,4,7,Anchored Single Arm Dumbbell Curl,,,,,,,,,,,,,,,,,,,,,,,,,,3,Lower Body + Carry Progression + Arm Support,Working,3,8,8,TRUE,15,7.1,125,Below
+Compliance,4,7,Dead Hang,,,,,,,,,,,,,,,,,,,,,,,,,,3,Lower Body + Carry Progression + Arm Support,Working,2,,,TRUE,8,,100,
+Compliance,4,7,Plate Pinch,,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Capacity + Grip,Working,3,,,TRUE,12,,100,
+Compliance,4,7,Anchored Single Arm Dumbbell Curl,,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Capacity + Grip,Working,4,8,8,TRUE,16,7,100,Below
+Compliance,4,7,Single-Arm Overhead Cable Extension,,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Capacity + Grip,Working,4,10,12,TRUE,16,10.9,100,In Range
+Compliance,4,7,High Cable Tricep Pushdown,,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Capacity + Grip,Working,3,10,12,TRUE,15,9,125,Below
+Compliance,4,7,Hammer Curls with Rope and Cable,,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Capacity + Grip,Working,3,10,12,TRUE,12,10.5,100,In Range
+Compliance,4,7,Dead Hang,,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Capacity + Grip,Working,2,,,TRUE,8,,100,
+Compliance,4,7,Farmer's Walk,,,,,,,,,,,,,,,,,,,,,,,,,,4,Arms + Capacity + Grip,Working,5,,,TRUE,20,,100,
+Compliance,4,7,Dumbbell Romanian Deadlift,,,,,,,,,,,,,,,,,,,,,,,,,,3,Lower Body + Carry Progression + Arm Support,Working,3,8,8,TRUE,12,8.6,100,Above
+Compliance,4,7,Cable Fly (Standing),,,,,,,,,,,,,,,,,,,,,,,,,,2,Heavy Press + Triceps Priority,Working,2,12,15,TRUE,13,13.3,162.5,In Range
+Compliance,4,7,Dead Hang,,,,,,,,,,,,,,,,,,,,,,,,,,2,Heavy Press + Triceps Priority,Working,2,,,TRUE,8,,100,
+Compliance,4,7,Goblet Squat,,,,,,,,,,,,,,,,,,,,,,,,,,3,Lower Body + Carry Progression + Arm Support,Working,3,10,10,TRUE,12,9.9,100,Below
+Compliance,4,7,Machine Row,,,,,,,,,,,,,,,,,,,,,,,,,,1,Heavy Pull + Carry + Arm Specialization,Working,4,6,8,TRUE,12,6,100,In Range
+Compliance,4,7,Body Row,,,,,,,,,,,,,,,,,,,,,,,,,,1,Heavy Pull + Carry + Arm Specialization,Working,3,8,8,TRUE,12,7.8,100,Below
+Compliance,4,7,Anchored Single Arm Dumbbell Curl,,,,,,,,,,,,,,,,,,,,,,,,,,1,Heavy Pull + Carry + Arm Specialization,Working,3,8,8,TRUE,16,6.2,133.3,Below
+Compliance,4,7,Single-Arm Overhead Cable Extension,,,,,,,,,,,,,,,,,,,,,,,,,,1,Heavy Pull + Carry + Arm Specialization,Working,4,10,12,TRUE,16,10.6,100,In Range
+Compliance,4,7,Plate Pinch,,,,,,,,,,,,,,,,,,,,,,,,,,1,Heavy Pull + Carry + Arm Specialization,Working,3,,,TRUE,12,,100,
+Compliance,4,7,Farmer's Walk,,,,,,,,,,,,,,,,,,,,,,,,,,1,Heavy Pull + Carry + Arm Specialization,Working,5,,,TRUE,20,,100,
+Compliance,4,7,Neutral Grip Dumbbell Floor Press,,,,,,,,,,,,,,,,,,,,,,,,,,2,Heavy Press + Triceps Priority,Working,4,6,8,TRUE,16,6.9,100,In Range
+Compliance,4,7,Machine Chest Press,,,,,,,,,,,,,,,,,,,,,,,,,,2,Heavy Press + Triceps Priority,Working,3,8,10,TRUE,16,9.6,133.3,In Range
+Compliance,4,7,Single-Arm Overhead Cable Extension,,,,,,,,,,,,,,,,,,,,,,,,,,2,Heavy Press + Triceps Priority,Working,4,10,12,TRUE,16,9.8,100,Below
+Compliance,4,7,High Cable Tricep Pushdown,,,,,,,,,,,,,,,,,,,,,,,,,,2,Heavy Press + Triceps Priority,Working,3,10,12,TRUE,14,8.6,116.7,Below
+Compliance,4,7,Dead Hang,,,,,,,,,,,,,,,,,,,,,,,,,,1,Heavy Pull + Carry + Arm Specialization,Working,2,,,TRUE,8,,100,
+Compliance,4,7,Plate Pinch,,,,,,,,,,,,,,,,,,,,,,,,,,2,Heavy Press + Triceps Priority,Working,3,,,TRUE,12,,100,
+Compliance,4,8,Dumbbell Romanian Deadlift,,,,,,,,,,,,,,,,,,,,,,,,,,3,Lower Body + Unilateral Strength,Working,3,8,10,TRUE,12,9.3,100,In Range
+Compliance,4,8,Bulgarian Split Squat,,,,,,,,,,,,,,,,,,,,,,,,,,3,Lower Body + Unilateral Strength,Working,3,8,8,TRUE,13,8,108.3,In Range
+Compliance,4,8,Barbell Standing Calf Raise,,,,,,,,,,,,,,,,,,,,,,,,,,3,Lower Body + Unilateral Strength,Working,3,12,15,TRUE,13,14.5,108.3,In Range
+Compliance,4,8,Farmer's Walk,,,,,,,,,,,,,,,,,,,,,,,,,,3,Lower Body + Unilateral Strength,Working,4,,,TRUE,16,,100,
+Compliance,4,8,Single-Arm Overhead Cable Extension,,,,,,,,,,,,,,,,,,,,,,,,,,4,Upper Hypertrophy + Capacity,Working,3,8,10,TRUE,12,9.9,100,In Range
+Compliance,4,8,Alternate Seated DB Curl,,,,,,,,,,,,,,,,,,,,,,,,,,4,Upper Hypertrophy + Capacity,Working,3,8,10,TRUE,13,9.8,108.3,In Range
+Compliance,4,8,Single Arm Rope Curl (extended Arm Position ),,,,,,,,,,,,,,,,,,,,,,,,,,4,Upper Hypertrophy + Capacity,Working,3,10,12,TRUE,12,10.5,100,In Range
+Compliance,4,8,High Cable Tricep Pushdown,,,,,,,,,,,,,,,,,,,,,,,,,,4,Upper Hypertrophy + Capacity,Working,3,8,10,TRUE,12,9.5,100,In Range
+Compliance,4,8,Face Pull (w External Rotation),,,,,,,,,,,,,,,,,,,,,,,,,,4,Upper Hypertrophy + Capacity,Working,3,15,15,TRUE,12,14.6,100,Below
+Compliance,4,8,Goblet Squat,,,,,,,,,,,,,,,,,,,,,,,,,,3,Lower Body + Unilateral Strength,Working,4,8,10,TRUE,16,9.5,100,In Range
+Compliance,4,8,Rowing,,,,,,,,,,,,,,,,,,,,,,,,,,3,Lower Body + Unilateral Strength,Capacity,1,,,TRUE,16,,400,
+Compliance,4,8,Endless Rope,,,,,,,,,,,,,,,,,,,,,,,,,,2,Heavy Push + Shoulder Reintegration,Capacity,6,,,TRUE,24,,100,
+Compliance,4,8,Rowing,,,,,,,,,,,,,,,,,,,,,,,,,,1,Heavy Pull + Grip Strength,Capacity,1,,,TRUE,2,,100,
+Compliance,4,8,Single-Arm Overhead Cable Extension,,,,,,,,,,,,,,,,,,,,,,,,,,2,Heavy Push + Shoulder Reintegration,Working,3,10,12,TRUE,12,8.2,100,Below
+Compliance,4,8,Seated Neutral Grip DB Overhead Press,,,,,,,,,,,,,,,,,,,,,,,,,,2,Heavy Push + Shoulder Reintegration,Working,3,10,10,TRUE,12,10.4,100,Above
+Compliance,4,8,Cable High To Mid Fly,,,,,,,,,,,,,,,,,,,,,,,,,,2,Heavy Push + Shoulder Reintegration,Working,3,12,15,TRUE,14,10,116.7,Below
+Compliance,4,8,Machine Chest Press,,,,,,,,,,,,,,,,,,,,,,,,,,2,Heavy Push + Shoulder Reintegration,Working,3,8,12,TRUE,13,9.2,108.3,In Range
+Compliance,4,8,Neutral Grip Dumbbell Floor Press,,,,,,,,,,,,,,,,,,,,,,,,,,2,Heavy Push + Shoulder Reintegration,Working,4,6,10,TRUE,16,8.1,100,In Range
+Compliance,4,8,Face Pull,,,,,,,,,,,,,,,,,,,,,,,,,,1,Heavy Pull + Grip Strength,Working,3,15,15,TRUE,12,14.8,100,Below
+Compliance,4,8,Incline Dumbbell Curl (Supinated),,,,,,,,,,,,,,,,,,,,,,,,,,1,Heavy Pull + Grip Strength,Working,3,10,12,TRUE,12,9.7,100,Below
+Compliance,4,8,Single-Arm Neutral Grip Cable Pulldown,,,,,,,,,,,,,,,,,,,,,,,,,,1,Heavy Pull + Grip Strength,Working,3,10,12,TRUE,12,11.3,100,In Range
+Compliance,4,8,Machine Row,,,,,,,,,,,,,,,,,,,,,,,,,,1,Heavy Pull + Grip Strength,Working,4,8,10,TRUE,16,8.4,100,In Range
+Compliance,4,8,Farmer's Walk,,,,,,,,,,,,,,,,,,,,,,,,,,1,Heavy Pull + Grip Strength,Working,5,,,TRUE,17,,85,
+Compliance,4,8,Farmer’s Hold,,,,,,,,,,,,,,,,,,,,,,,,,,4,Upper Hypertrophy + Capacity,Working,4,,,TRUE,16,,100,
+Compliance,4,8,High Cable Tricep Pushdown,,,,,,,,,,,,,,,,,,,,,,,,,,2,Heavy Push + Shoulder Reintegration,Working,2,12,15,TRUE,14,8.3,175,Below
+Compliance,4,8,Endless Rope,,,,,,,,,,,,,,,,,,,,,,,,,,4,Upper Hypertrophy + Capacity,Capacity,6,,,TRUE,18,,100,

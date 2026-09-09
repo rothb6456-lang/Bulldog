@@ -1,0 +1,99 @@
+﻿ExerciseName,MuscleGroup,MovementPattern,Category,EquipmentType,IsUnilateral,IsTimed
+Alternate Seated DB Curl,,Curl,Arms_Biceps,,True,False
+Anchored Single Arm Dumbbell Curl,,Curl,Arms_Biceps,,True,False
+Cross Body Cable Curl,,Curl,Arms_Biceps,,True,False
+DB Cross Body Curl (Hammer Grip),Other,Curl,Arms_Biceps,Bodyweight,True,False
+DB Spider Curl (Hammer),Upper Arms,Curl,Arms_Biceps,Dumbbells,False,False
+Dumbbell: Squeeze Curl - Neutral,Upper Arms,Curl,Arms_Biceps,Dumbbells,False,False
+Hammer Curls with Rope and Cable,,Curl,Arms_Biceps,,False,False
+Incline DB Hammer Curl,Upper Arms,Curl,Arms_Biceps,Dumbbells,False,False
+Incline Dumbbell Curl (Supinated),Upper Arms,Curl,Arms_Biceps,Dumbbells;Bench,False,False
+Seated Single Arm DB Curl - Anchored,Upper Arms,Curl,Arms_Biceps,Dumbbells,True,False
+Single Arm Rope Curl (extended Arm Position ),,Curl,Arms_Biceps,,True,False
+Standing One Arm Bicep Curl with Cable (Anchored),Forearms;Upper Arms,Curl,Arms_Biceps,Machine,True,False
+Standing One Arm Extended Cable Curls,Upper Arms,Curl,Arms_Biceps,Machine,True,False
+Standing Single Arm Cable Curl,Upper Arms,Curl,Arms_Biceps,Machine,True,False
+Cable Push-Downs,Upper Arms,Extension,Arms_Triceps,Machine,False,False
+Cable Triceps Extension - “Quad”,Upper Arms,Extension,Arms_Triceps,Machine,False,False
+High Cable Tricep Pushdown,,Extension,Arms_Triceps,,False,False
+Kneeling Single Arm Rope Cable Extension,,Extension,Arms_Triceps,,True,False
+Rope Push-Downs,Upper Arms,Extension,Arms_Triceps,Machine,False,False
+Single Arm Cable Extensions,Upper Arms,Extension,Arms_Triceps,Machine,True,False
+Single-Arm Cable Triceps Extension (Cross-Body),Upper Arms,Extension,Arms_Triceps,Machine,True,False
+Single-Arm Overhead Cable Extension,,Extension,Arms_Triceps,,True,False
+Vertical DB Scap extension,,Extension,Arms_Triceps,,False,False
+Cycling,,Cardio,Cardio,,False,True
+Endless Rope,,Cardio,Cardio,,False,True
+Treadmill Walking,Cardio,Cardio,Cardio,Machine,False,True
+Dead Hang,Other,Hang,Carry,Bodyweight,False,True
+Farmer's Walk,Other,Carry,Carry,Dumbbells,False,True
+Farmer’s Hold,Other,Carry,Carry,Bodyweight,False,True
+Plate Pinch,,Pinch,Carry,,False,True
+Suitcase Carries,Other,Carry,Carry,Dumbbells,True,True
+Suitcase Holds,Other,Carry,Carry,Dumbbells,True,True
+Captains Chair Knee Raises,Other,Core,Core,Other,False,False
+Hanging Knee Raises,Other,Core,Core,Other,False,False
+Pallof Press,Other,Core,Core,Bodyweight,False,False
+Side Plank,,Core,Core,,False,True
+Barbell Standing Calf Raise,,Calf,Legs,,False,False
+Bulgarian Split Squat,,Squat/Lunge,Legs,,True,False
+Cable Pull-Through,Back;Thighs,Hip Hinge,Legs,Machine,False,False
+Calf Extension (Machine),Other,Calf,Legs,Machine,False,False
+Dumbbell Romanian Deadlift,,Hip Hinge,Legs,,False,False
+Front-Foot-Elevated Split Squat,Calves;Hips;Thighs,Squat/Lunge,Legs,Dumbbells,True,False
+Glute Extension,Hips;Other,Hip Extension,Legs,Machine,False,False
+Goblet Squat,,Squat/Lunge,Legs,,False,False
+Prisoners Squat,,Squat/Lunge,Legs,,False,False
+Reverse Lunge,Hips;Thighs,Squat/Lunge,Legs,Other,True,False
+Seated Calf Raise,Calves,Calf,Legs,Machine,False,False
+Smith Machine Split Squat (rear foot elevated optional),,Squat/Lunge,Legs,,True,False
+Standing Calf Raise,,Calf,Legs,,False,False
+Tibia Flex,,Calf,Legs,,False,False
+Walking Lunges,,Squat/Lunge,Legs,,True,False
+Half-Kneeling Single-Arm DB Press,Shoulders,Other,Other,Dumbbells,True,False
+Body Row,Back;Chest;Neck;Waist,Pull,Pull,Barbell,False,False
+Chest Supported DB Row (Spider),Back,Pull,Pull,Dumbbells,False,False
+Chest Supported Rear Delt Fly,Back,Pull,Pull,Machine,False,False
+Face Pull,Other,Pull,Pull,Bodyweight,False,False
+Face Pull (w External Rotation),,Pull,Pull,,False,False
+Half-Kneeling Single Arm Cable Row,,Pull,Pull,,True,False
+Half-Kneeling Single-Arm Cable Pulldown,Back,Pull,Pull,Machine,True,False
+"Half-Kneeling Single-Arm Cable Row, Low-to-High Finish",,Pull,Pull,,True,False
+Kneeling Cable Row,Back,Pull,Pull,Machine,False,False
+Machine Row,Other,Pull,Pull,Bodyweight,False,False
+Neutral Grip Seated 2 Arm Row,Back,Pull,Pull,Machine,False,False
+Plate Loaded Seated Row,Back,Pull,Pull,Machine,False,False
+Rear Delt Cable Fly,,Pull,Pull,,False,False
+Rowing,Cardio,Pull,Pull,Bodyweight,False,True
+Seat Cable Row (V / Narrow Neutral Grip),,Pull,Pull,,False,False
+Single-Arm Cable Row (Split Stance),Back,Pull,Pull,Machine,True,False
+Single-Arm Neutral Grip Cable Pulldown,Back,Pull,Pull,Bodyweight,True,False
+Cable Chest Press (2 Arm),Chest,Horizontal Press,Push,Bench;Machine,False,False
+Cable Fly (Standing),,Fly,Push,,False,False
+Cable High To Mid Fly,,Fly,Push,,False,False
+Cable Lateral Raise (using elbow strap setup),,Lateral Raise,Push,,False,False
+DB Neutral Press (slight Rotate To Underhand ),Chest,Horizontal Press,Push,Dumbbells,False,False
+Dumbbell Lateral Raise,,Lateral Raise,Push,,False,False
+Incline Push-up,,Horizontal Press,Push,,False,False
+Low-Incline DB Press (15–30°),,Horizontal Press,Push,,False,False
+Machine Chest Press,,Horizontal Press,Push,,False,False
+Neutral Grip Dumbbell Floor Press,,Horizontal Press,Push,,False,False
+Pec Fly,,Fly,Push,,False,False
+Push-up,Chest,Horizontal Press,Push,Bodyweight,False,False
+Push-up On Knees,Chest,Horizontal Press,Push,Bodyweight,False,False
+Scap Push Ups,Other;Shoulders,Horizontal Press,Push,Bodyweight,False,False
+Seated Neutral Grip DB Overhead Press,,Horizontal Press,Push,,False,False
+Single Arm Cable Press,,Horizontal Press,Push,,True,False
+Single Arm Cable Press (split stance),,Horizontal Press,Push,,True,False
+Single-Arm DB Balance Press,Chest,Horizontal Press,Push,Dumbbells,True,False
+Single-Arm Vertical Plate Balance Press,Chest,Horizontal Press,Push,Dumbbells;Other,True,False
+Smith Machine Bench Press,Chest;Shoulders;Upper Arms,Horizontal Press,Push,Bench;Machine,False,False
+Supine Press Machine - Plate Loaded (Planet Fitness),Chest,Horizontal Press,Push,Machine;Other,False,False
+Band External Rotations,,Activation,Warmup,,False,False
+Band Pull Aparts,,Activation,Warmup,,False,False
+Cable External Rotation,,Activation,Warmup,,False,False
+Cat-Camel,,Activation,Warmup,,False,False
+Hip Hinge,,Activation,Warmup,,False,False
+Inverted KB Hold,,Stability,Warmup,,False,True
+Inverted KB Press,Other,Stability,Warmup,Dumbbells,False,False
+Serratus Wall Slides (banded),,Activation,Warmup,,False,False

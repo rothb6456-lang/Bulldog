@@ -1,0 +1,4 @@
+﻿CHANGELOG,,
+,,
+Date,Author,Change Description
+2026-08-02 00:00:00,Claude & Brian,"Initial database build. Imported 8 phases of training data (Jan 2026 - Jul 2026). Created Raw_Combined_Import, tbl_Sessions (129 sessions), tbl_Exercises (2967 sets), tbl_PRs (32 records), tbl_VolumeWeekly (31 weeks), tbl_VolumeMonthly (8 months), tbl_Lookup_Exercises (104 exercises). Built Dashboard_Overview, Dashboard_Exercises (with dropdown), and Dashboard_Progress."

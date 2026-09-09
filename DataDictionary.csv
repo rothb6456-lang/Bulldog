@@ -1,0 +1,13 @@
+﻿TableName,FieldName,DataType,IsPrimaryKey,IsForeignKey,ForeignKey,AllowedValues,IsRequired,IsCalculated,DefaultValue,Description,Example,Notes
+Which table this field belongs to,Column name,"Text, Integer, Decimal, Date, DateTime, Boolean",TRUE/FALSE,TRUE/FALSE,"Table and field referenced (e.g., ""tbl_Phases.PhaseID"")",Constrained value list if applicable,TRUE/FALSE,TRUE/FALSE (derived vs. entered),Default if any,Human-readable description of the field's purpose,Example value,Additional context
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,

@@ -1,0 +1,103 @@
+﻿ExerciseID,ExerciseName,MovementPattern,PrimaryMuscle,SecondaryMuscles,DefaultEquipmentID,Laterality,ExerciseCategory,IsTimeBased,IsDistanceBased,PreferredReplacements,ShoulderSafetyNotes,Notes
+EX-FW,Farmer's Walk,Carry,Forearms,Traps; Core; Shoulders,EQ-DB,Bilateral,Carry,True,False,,Well tolerated,Primary grip and carry exercise throughout all phases  
+EX-FH,Farmer's Hold,Hold,Forearms,Traps; Core,EQ-DB,Bilateral,Hold,True,False,EX-FW,,Static hold version of farmer's walk  
+EX-SC,Suitcase Carries,Carry,Forearms,Obliques; Core; Traps,EQ-DB,Unilateral,Carry,True,False,,Well tolerated,Single-side carry emphasizing anti-lateral flexion  
+EX-SH,Suitcase Holds,Hold,Forearms,Obliques; Core,EQ-DB,Unilateral,Hold,True,False,EX-SC,,Static hold version of suitcase carry  
+EX-BR,Body Row,Pull,Back,Biceps; Forearms; Core,EQ-BB,Bilateral,Compound,False,False,,Well tolerated,Inverted row using barbell in rack  
+EX-MR,Machine Row,Pull,Back,Biceps; Forearms,EQ-LF-MR,Bilateral,Compound,False,False,EX-NGSR,Well tolerated,Chest-supported selectorized row  
+EX-NGSR,Neutral Grip Seated 2 Arm Row,Pull,Back,Biceps; Forearms,EQ-CAB,Bilateral,Compound,False,False,EX-MR,Well tolerated,Seated cable row with neutral grip attachment  
+EX-CSDR,Chest Supported DB Row (Spider),Pull,Back,Biceps; Rear Delts; Forearms,EQ-DB,Bilateral,Compound,False,False,,Well tolerated,Incline bench chest-supported dumbbell row  
+EX-SANGCP,Single-Arm Neutral Grip Cable Pulldown,Pull,Lats,Biceps; Forearms; Rear Delts,EQ-CAB,Unilateral,Compound,False,False,,Slight lean back eliminates anterior capsule awareness,Primary lat exercise from Phase 3 onward  
+EX-KCR,Kneeling Cable Row,Pull,Back,Biceps; Core; Forearms,EQ-CAB,Bilateral,Compound,False,False,EX-NGSR,Well tolerated,Kneeling position at seated cable row  
+EX-HKSAR,Half-Kneeling Single Arm Cable Row,Pull,Back,Core; Biceps; Forearms,EQ-CAB,Unilateral,Compound,False,False,,Well tolerated,Half-kneeling unilateral cable row  
+EX-HKSARCR,"Half-Kneeling Single-Arm Cable Row, Low-to-High Finish",Pull,Back,Rear Delts; Core; Biceps,EQ-CAB,Unilateral,Compound,False,False,EX-HKSAR,Well tolerated,Low-to-high finish variant  
+EX-SACRS,Single-Arm Cable Row (Split Stance),Pull,Back,Core; Biceps; Forearms,EQ-CAB,Unilateral,Compound,False,False,EX-HKSAR,Well tolerated,Split stance cable row  
+EX-SCVNGR,Seat Cable Row (V / Narrow Neutral Grip),Pull,Back,Biceps; Forearms,EQ-CAB,Bilateral,Compound,False,False,EX-NGSR,Well tolerated,V-grip narrow neutral cable row  
+EX-PLSR,Plate Loaded Seated Row,Pull,Back,Biceps; Forearms,EQ-PLM,Bilateral,Compound,False,False,EX-MR,Well tolerated,Plate-loaded seated row machine  
+EX-FP,Face Pull,Pull,Rear Delts,Traps; Rhomboids; External Rotators,EQ-CAB,Bilateral,Isolation,False,False,,Well tolerated,Standard face pull with rope  
+EX-FPWR,Face Pull (w External Rotation),Pull,Rear Delts,External Rotators; Traps; Rhomboids,EQ-CAB,Bilateral,Isolation,False,False,EX-FP,Monitor right shoulder during external rotation,Face pull with added external rotation component  
+EX-RDCF,Rear Delt Cable Fly,Pull,Rear Delts,Rhomboids; Traps,EQ-CAB,Bilateral,Isolation,False,False,EX-FP,Well tolerated,Standing cable rear delt fly  
+EX-CSRDF,Chest Supported Rear Delt Fly,Pull,Rear Delts,Rhomboids; Traps,EQ-DB,Bilateral,Isolation,False,False,EX-RDCF,Well tolerated,Incline bench chest-supported rear delt fly  
+EX-SADBC-A,Seated Single Arm DB Curl - Anchored,Isolation,Biceps,Forearms; Brachialis,EQ-DB,Unilateral,Isolation,False,False,,Well tolerated,Seated single-arm curl with opposite hand anchored  
+EX-ADBC,Anchored Single Arm Dumbbell Curl,Isolation,Biceps,Forearms; Brachialis,EQ-DB,Unilateral,Isolation,False,False,EX-SADBC-A,Well tolerated,Standing or seated anchored curl  
+EX-SOAECC,Standing One Arm Extended Cable Curls,Isolation,Biceps,Forearms; Brachialis,EQ-CAB,Unilateral,Isolation,False,False,,Well tolerated,Cable curl with arm extended behind body  
+EX-SOABCC,Standing One Arm Bicep Curl with Cable (Anchored),Isolation,Biceps,Forearms; Brachialis,EQ-CAB,Unilateral,Isolation,False,False,EX-SOAECC,Well tolerated,Cable curl with elbow anchored  
+EX-IDC,Incline Dumbell Curl (Supinated),Isolation,Biceps,Forearms,EQ-DB,Bilateral,Isolation,False,False,,Well tolerated,Incline bench supinated dumbbell curl  
+EX-IDCH,Incline DB Hammer Curl,Isolation,Brachialis,Biceps; Forearms,EQ-DB,Bilateral,Isolation,False,False,EX-IDC,Well tolerated,Incline bench hammer grip curl  
+EX-DSCH,DB Spider Curl (Hammer),Isolation,Brachialis,Biceps; Forearms,EQ-DB,Bilateral,Isolation,False,False,,Well tolerated,Spider curl on incline bench with hammer grip  
+EX-ASDBC,Alternate Seated DB Curl,Isolation,Biceps,Forearms; Brachialis,EQ-DB,Alternating,Isolation,False,False,,Well tolerated,Alternating seated dumbbell curl with supination  
+EX-SARCC,Single Arm Rope Curl (extended Arm Position),Isolation,Biceps,Brachialis; Forearms,EQ-CAB,Unilateral,Isolation,False,False,EX-SOAECC,Well tolerated,Single arm cable curl with rope grip  
+EX-HCRC,Hammer Curls with Rope and Cable,Isolation,Brachialis,Biceps; Forearms,EQ-CAB,Bilateral,Isolation,False,False,,Well tolerated,Rope attachment hammer curl on cable  
+EX-CBCC,Cross Body Cable Curl,Isolation,Biceps,Brachialis; Forearms,EQ-CAB,Unilateral,Isolation,False,False,,Well tolerated,Cross-body cable curl  
+EX-SACCC,Standing Single Arm Cable Curl,Isolation,Biceps,Forearms; Brachialis,EQ-CAB,Unilateral,Isolation,False,False,EX-SOAECC,Well tolerated,Standard single arm cable curl  
+EX-DBC,Dumbbell Incline Curl,Isolation,Biceps,Forearms,EQ-DB,Bilateral,Isolation,False,False,EX-IDC,Well tolerated,Incline dumbbell curl variant  
+EX-1ACC,1 Arm Cable Curl,Isolation,Biceps,Forearms,EQ-CAB,Unilateral,Isolation,False,False,,Well tolerated,Single arm cable curl  
+EX-DBSCN,Dumbbell: Squeeze Curl - Neutral,Isolation,Biceps,Brachialis; Forearms,EQ-DB,Bilateral,Isolation,False,False,,Well tolerated,Dumbbell squeeze curl variations  
+EX-DSCH2,Dumbbell: Squeeze Curl - Hammer,Isolation,Brachialis,Biceps; Forearms,EQ-DB,Bilateral,Isolation,False,False,,Well tolerated,Hammer grip squeeze curl  
+EX-DBCBH,DB Cross Body Curl (Hammer Grip),Isolation,Brachialis,Biceps; Forearms,EQ-DB,Unilateral,Isolation,False,False,,Well tolerated,Cross body hammer curl with dumbbell  
+EX-NGDFP,Neutral Grip Dumbbell Floor Press,Push,Chest,Triceps; Anterior Delts,EQ-DB,Bilateral,Compound,False,False,,Right anterior capsule awareness during heavy sets; neutral grip well tolerated,Primary pressing movement from Phase 6 onward  
+EX-SMBP,Smith Machine Bench Press,Push,Chest,Triceps; Anterior Delts,EQ-SM,Bilateral,Compound,False,False,EX-NGDFP,Right anterior capsule tightness; monitor closely,Used in Phases 3-4  
+EX-SPML,Supine Press Machine - Plate Loaded (Planet Fitness),Push,Chest,Triceps; Anterior Delts,EQ-PLM,Bilateral,Compound,False,False,EX-NGDFP,Some right capsule tightness at higher weights,Planet Fitness specific plate-loaded press  
+EX-DBNP,DB Neutral Press (slight Rotate To Underhand),Push,Chest,Triceps; Anterior Delts,EQ-DB,Bilateral,Compound,False,False,EX-NGDFP,Neutral grip well tolerated,Floor press or bench press with neutral grip and slight underhand rotation  
+EX-LIDBP,Low-Incline DB Press (15-30°),Push,Upper Chest,Triceps; Anterior Delts,EQ-DB,Bilateral,Compound,False,False,,Left trap compensation noted; monitor,Low incline dumbbell press  
+EX-SACP,Single Arm Cable Press,Push,Chest,Triceps; Anterior Delts; Core,EQ-CAB,Unilateral,Compound,False,False,,Right extension not as strong as left; some trap recruitment,Single arm cable press in split stance  
+EX-SACPSS,Single Arm Cable Press (split stance),Push,Chest,Triceps; Anterior Delts; Core,EQ-CAB,Unilateral,Compound,False,False,EX-SACP,Right extension not as strong as left,Split stance variant  
+EX-MCP,Machine Chest Press,Push,Chest,Triceps; Anterior Delts,EQ-LF-CP,Bilateral,Compound,False,False,EX-NGDFP,Right anterior capsule awareness on eccentric,Selectorized chest press machine  
+EX-SAVPBP,Single-Arm Vertical Plate Balance Press,Push,Chest,Triceps; Stabilizers; Core,EQ-PLT,Unilateral,Compound,False,False,,Left has more control than right,Vertical plate balance floor press  
+EX-SADBP,Single-Arm DB Balance Press,Push,Chest,Triceps; Stabilizers; Core,EQ-DB,Unilateral,Compound,False,False,EX-SAVPBP,Well tolerated,Single arm DB balance press  
+EX-CSF,Cable Fly (Standing),Push,Chest,Anterior Delts,EQ-CAB,Bilateral,Isolation,False,False,,Well tolerated with cuff attachment,Standing cable fly  
+EX-CHMF,Cable High To Mid Fly,Push,Chest,Anterior Delts,EQ-CAB,Bilateral,Isolation,False,False,EX-CSF,Right tightness at full extension; slightly shorten ROM,High to mid cable fly  
+EX-PF,Pec Fly,Push,Chest,Anterior Delts,EQ-MCH,Bilateral,Isolation,False,False,EX-CSF,Right sensitive with quick movement,Machine pec fly  
+EX-HCTP,High Cable Tricep Pushdown,Isolation,Triceps,Forearms,EQ-CAB,Bilateral,Isolation,False,False,,Shoulders roll forward if ROM too high; keep 90-100 degree ROM,High cable tricep pushdown with straight bar  
+EX-RPD,Rope Push-Downs,Isolation,Triceps,Forearms,EQ-CAB,Bilateral,Isolation,False,False,EX-HCTP,Well tolerated,Rope attachment pushdown  
+EX-SAOCE,Single-Arm Overhead Cable Extension,Isolation,Triceps,None,EQ-CAB,Unilateral,Isolation,False,False,,Feels good on anterior capsule; seems to loosen it,Single arm overhead cable extension  
+EX-SACE,Single Arm Cable Extensions,Isolation,Triceps,None,EQ-CAB,Unilateral,Isolation,False,False,EX-SAOCE,Well tolerated,General single arm cable extension  
+EX-CTE-Q,Cable Triceps Extension - Quad,Isolation,Triceps,None,EQ-CAB,Unilateral,Isolation,False,False,,Well tolerated; significant left-right asymmetry noted,Four-position cable tricep extension  
+EX-KSARCE,Kneeling Single Arm Rope Cable Extension,Isolation,Triceps,None,EQ-CAB,Unilateral,Isolation,False,False,EX-SAOCE,Well tolerated,Kneeling single arm rope extension  
+EX-SASED,Standing Single Arm Extension (D-Grip),Isolation,Triceps,None,EQ-CAB,Unilateral,Isolation,False,False,EX-SACE,Well tolerated,D-grip single arm cable extension  
+EX-SACTE-CB,Single-Arm Cable Triceps Extension (Cross-Body),Isolation,Triceps,None,EQ-CAB,Unilateral,Isolation,False,False,EX-SACE,Well tolerated,Cross body cable tricep extension  
+EX-CPD,Cable Push-Downs,Isolation,Triceps,None,EQ-CAB,Bilateral,Isolation,False,False,EX-RPD,Well tolerated,General cable pushdown  
+EX-CKOE,Cable: Kneeling 1Arm Overhead Extension,Isolation,Triceps,None,EQ-CAB,Unilateral,Isolation,False,False,EX-SAOCE,Well tolerated,Kneeling overhead cable extension  
+EX-IKBP,Inverted KB Press,Push,Chest,Triceps; Stabilizers,EQ-KB,Bilateral,Compound,False,False,,Well tolerated,Floor press with inverted kettlebell  
+EX-DBRDL,Dumbbell Romanian Deadlift,Hinge,Hamstrings,Glutes; Lower Back; Forearms,EQ-DB,Bilateral,Compound,False,False,,Well tolerated; grip limiting factor at heavy weights,Primary hinge movement  
+EX-BSS,Bulgarian Split Squat,Squat,Quads,Glutes; Hamstrings; Core,EQ-DB,Unilateral,Compound,False,False,,Well tolerated,Rear foot elevated split squat  
+EX-SMSSQ,Smith Machine Split Squat (rear foot elevated optional),Squat,Quads,Glutes; Hamstrings; Core,EQ-SM,Unilateral,Compound,False,False,EX-BSS,Well tolerated,Smith machine split squat  
+EX-GS,Goblet Squat,Squat,Quads,Glutes; Core; Hamstrings,EQ-DB,Bilateral,Compound,False,False,,Well tolerated,Dumbbell or kettlebell goblet squat  
+EX-PS,Prisoners Squat,Squat,Quads,Glutes; Core,EQ-BW,Bilateral,Warmup,False,False,,Well tolerated,Bodyweight squat with hands behind head  
+EX-WL,Walking Lunges,Squat,Quads,Glutes; Hamstrings; Calves,EQ-DB,Alternating,Compound,False,False,,Well tolerated,Walking lunge with dumbbells or kettlebell  
+EX-RL,Reverse Lunge,Squat,Quads,Glutes; Hamstrings,EQ-BW,Alternating,Compound,False,False,EX-WL,Well tolerated,Reverse stepping lunge  
+EX-FFESR,Front-Foot-Elevated Split Squat,Squat,Quads,Glutes; Hamstrings; Core,EQ-DB,Unilateral,Compound,False,False,EX-BSS,Well tolerated,Front foot on plates for increased ROM  
+EX-SCR,Standing Calf Raise,Isolation,Calves,None,EQ-SM,Bilateral,Isolation,False,False,,Well tolerated,Smith machine or barbell calf raise  
+EX-BSCR,Barbell Standing Calf Raise,Isolation,Calves,None,EQ-BB,Bilateral,Isolation,False,False,EX-SCR,Well tolerated,Barbell calf raise on plates  
+EX-SECR,Seated Calf Raise,Isolation,Calves,None,EQ-MCH,Bilateral,Isolation,False,False,EX-SCR,Well tolerated,Seated calf raise machine  
+EX-CEM,Calf Extension (Machine),Isolation,Calves,None,EQ-MCH,Bilateral,Isolation,False,False,EX-SCR,Well tolerated,Calf extension on leg press or machine  
+EX-GE,Glute Extension,Isolation,Glutes,Hamstrings,EQ-MCH,Unilateral,Isolation,False,False,,Well tolerated,Machine glute extension  
+EX-DLR,Dumbbell Lateral Raise,Isolation,Lateral Delts,Traps,EQ-DB,Bilateral,Isolation,False,False,,Slight right anterior capsule awareness at top; better with slight pronation,Dumbbell lateral raise  
+EX-CLR,Cable Lateral Raise (using elbow strap setup),Isolation,Lateral Delts,Traps,EQ-CAB,Unilateral,Isolation,False,False,EX-DLR,Well tolerated with elbow strap,Cable lateral raise using strap at elbow  
+EX-SNGDBOP,Seated Neutral Grip DB Overhead Press,Push,Shoulders,Triceps; Upper Chest,EQ-DB,Bilateral,Compound,False,False,,Subtle anterior capsule awareness on descending; tolerance improving,Seated dumbbell overhead press with neutral grip  
+EX-HKSADBP,Half-Kneeling Single-Arm DB Press,Push,Shoulders,Triceps; Core,EQ-DB,Unilateral,Compound,False,False,,Well tolerated,Half-kneeling single arm overhead press  
+EX-PP,Pallof Press,Core,Core,Obliques,EQ-CAB,Bilateral,Core,False,False,,Well tolerated; left side requires more anti-rotation effort,Anti-rotation cable press  
+EX-SP,Side Plank,Core,Obliques,Core; Shoulders,EQ-BW,Unilateral,Core,True,False,,Right shoulder feels looser than left on elbow; palm better tolerated,Isometric lateral core stability  
+EX-DH,Dead Hang,Hold,Forearms,Lats; Shoulders,EQ-BW,Bilateral,Hold,True,False,,Good scapular reset,Passive hang from pull-up bar  
+EX-PPC,Plate Pinch,Hold,Forearms,Fingers,EQ-PLT,Bilateral,Hold,True,False,,Well tolerated,Pinch grip hold with weight plates  
+EX-CKR,Captains Chair Knee Raises,Core,Core,Hip Flexors,EQ-MCH,Bilateral,Core,False,False,,Little tightness in right shoulder cap,Hanging knee raise on captain's chair  
+EX-HKR,Hanging Knee Raises,Core,Core,Hip Flexors; Forearms,EQ-BW,Bilateral,Core,False,False,EX-CKR,Well tolerated,Hanging knee raise from pull-up bar  
+EX-TF,Tibia Flex,Isolation,Tibialis Anterior,None,EQ-PLT,Bilateral,Isolation,False,False,,Well tolerated,Plate on toe tibialis anterior flexion  
+EX-ROW,Rowing,Cardio,Full Body,Legs; Back; Arms,EQ-C2,Bilateral,Cardio,True,True,,Well tolerated,Concept2 or similar rowing ergometer  
+EX-TW,Treadmill Walking,Cardio,Full Body,Legs; Core,EQ-TM,Bilateral,Cardio,True,True,,Well tolerated,Treadmill walking at various inclines  
+EX-CYC,Cycling,Cardio,Legs,Core,EQ-BIKE,Bilateral,Cardio,True,True,,Well tolerated,Stationary cycling  
+EX-ER,Endless Rope,Cardio,Forearms,Back; Shoulders; Biceps,EQ-ER,Bilateral,Cardio,True,False,,Slight anterior capsule trigger on right at initial reach,Marpo Kinetics or similar endless rope machine  
+EX-PU,Push-up,Push,Chest,Triceps; Anterior Delts; Core,EQ-BW,Bilateral,Compound,False,False,,Little anterior right tightness on lowering,Full push-up from toes  
+EX-PUK,Push-up On Knees,Push,Chest,Triceps; Anterior Delts; Core,EQ-BW,Bilateral,Compound,False,False,EX-PU,Well tolerated,Modified push-up from knees  
+EX-IPU,Incline Push-up,Push,Chest,Triceps; Anterior Delts; Core,EQ-BW,Bilateral,Compound,False,False,EX-PU,Well tolerated,Push-up with hands elevated on bar or bench  
+EX-SPU,Scap Push Ups,Mobility,Serratus Anterior,Shoulders,EQ-BW,Bilateral,Warmup,False,False,,Well tolerated,Scapular protraction/retraction from push-up position  
+EX-BPA,Band Pull Aparts,Mobility,Rear Delts,Rhomboids; Traps,EQ-BAND,Bilateral,Warmup,False,False,,Well tolerated,Band pull apart for shoulder warmup  
+EX-BER,Band External Rotations,Mobility,External Rotators,Rotator Cuff,EQ-BAND,Bilateral,Warmup,False,False,,Well tolerated,Banded external rotation warmup  
+EX-SWS,Serratus Wall Slides (banded),Mobility,Serratus Anterior,Shoulders; Traps,EQ-BAND,Bilateral,Warmup,False,False,,Well tolerated,Wall slide with band around wrists  
+EX-CC,Cat-Camel,Mobility,Spine,Core,EQ-BW,Bilateral,Warmup,False,False,,Well tolerated,Spinal flexion/extension mobilization  
+EX-CER,Cable External Rotation,Mobility,External Rotators,Rotator Cuff,EQ-CAB,Unilateral,Warmup,False,False,EX-BER,Left has less ROM than right,Cable external rotation  
+EX-IKBH,Inverted KB Hold,Mobility,Shoulders,Forearms; Stabilizers,EQ-KB,Bilateral,Rehab,True,False,,Well tolerated,Inverted kettlebell hold for shoulder stability  
+EX-VDBSE,Vertical DB Scap extension,Mobility,Serratus Anterior,Shoulders,EQ-DB,Bilateral,Rehab,False,False,,Well tolerated,Vertical dumbbell or plate scapular extension  
+EX-HH,Hip Hinge,Mobility,Hamstrings,Glutes; Lower Back,EQ-BW,Bilateral,Warmup,False,False,,Well tolerated,Bodyweight hip hinge pattern warmup  
+EX-CPT,Cable Pull-Through,Hinge,Glutes,Hamstrings; Lower Back,EQ-CAB,Bilateral,Compound,False,False,,Well tolerated,Cable pull-through for hip extension  
+EX-HKSACP,Half-Kneeling Single-Arm Cable Pulldown,Pull,Lats,Biceps; Forearms,EQ-CAB,Unilateral,Compound,False,False,EX-SANGCP,Well tolerated,Half-kneeling single arm cable pulldown  
