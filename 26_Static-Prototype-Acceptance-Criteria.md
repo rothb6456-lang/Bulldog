@@ -315,7 +315,7 @@ That is enough for Codex to work in a very structured way.
 
 # My final recommendation on folder ordering
 
-For the prototype phase, I’d keep these at the **top level** of `Statbook-Data-Architecture/` so Codex sees them immediately:
+For the prototype phase, keep these at the **repository root** so Codex sees them immediately:
 
 ```text
 00_README-Statbook-Data-Architecture.md
@@ -336,5 +336,5 @@ That keeps the active prototype playbook obvious.
 
 If you want, I can do **one final cleanup pass** next and give you:
 
-# a recommended final folder tree for the entire `Statbook-Data-Architecture` directory  
+# a recommended final folder tree for the entire repository
 including where the Word docs, screenshots, logo assets, and archived prompt fragments should go.

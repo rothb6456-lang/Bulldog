@@ -85,7 +85,7 @@ Each decision should include:
 
 ### Decision 007  
 **Topic:** Keep active guidance near the root    
-**Decision:** Place the most important prototype guidance docs at the root of `Statbook-Data-Architecture`.    
+**Decision:** Place the most important prototype guidance docs at the repository root.
 **Why:** This improves discoverability for both humans and machine retrieval.    
 **Impact:** Root-level governance docs should remain the fastest path to current prototype context.
 

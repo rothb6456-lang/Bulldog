@@ -40,7 +40,7 @@ This file should be used as the fastest orientation document before diving into 
 
 The Bulldog Statbook project has progressed from early data architecture and Laravel planning into a much more structured **static prototype phase**.
 
-A dedicated `Statbook-Data-Architecture` repository/folder structure has now been organized with:
+A dedicated repository structure has now been organized with:
 
 1. top-level governance files    
 2. product/planning documents    
@@ -106,7 +106,7 @@ These collectively define:
 
 ### 3. A formalized folder structure
 
-The `Statbook-Data-Architecture` directory has been organized into a predictable structure with numbered folders for:
+The repository has been organized into a predictable structure with numbered folders for:
 
 - planning  
 - architecture  
@@ -240,9 +240,9 @@ When conflicts arise, newer and more explicit prototype governance files should 
 The current intended structure is:
 
 ```text  
-Statbook-Data-Architecture/  
+./
 │  
-├── 00_README-Statbook-Data-Architecture.md  
+├── README.md
 ├── 00_Document-Priority-and-Source-of-Truth.md  
 ├── 00_Prototype-Scope-and-UX-Goals.md  
 ├── 00_Brand-and-Visual-Reference.md  
