@@ -160,8 +160,14 @@ class TrainingSessionController extends Controller
         }
 
         // Try ExerciseNameMap alias
-        $map = ExerciseNameMap::where('logged_name', $rawName)->first();
-        if ($map && $exercise = Exercise::find($map->canonical_exercise_id)) {
+        // Note: the schema column is `original_name` (migration 000002) and the
+        // FK to the canonical Exercise row is `exercise_id` (see
+        // ExerciseNameMap::$fillable / ExerciseNameMap::exercise()). Neither
+        // `logged_name` nor `canonical_exercise_id` has ever existed on this
+        // table -- the former threw a 500 on every unmapped exercise name,
+        // the latter silently no-opped, so this lookup has never succeeded.
+        $map = ExerciseNameMap::where('original_name', $rawName)->first();
+        if ($map && $exercise = Exercise::find($map->exercise_id)) {
             return $exercise;
         }
 

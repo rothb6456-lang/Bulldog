@@ -1,0 +1,21 @@
+diff --git a/app/Http/Controllers/Api/V1/Training/TrainingSessionController.php b/app/Http/Controllers/Api/V1/Training/TrainingSessionController.php
+index 154c0af..383fe26 100644
+--- a/app/Http/Controllers/Api/V1/Training/TrainingSessionController.php
++++ b/app/Http/Controllers/Api/V1/Training/TrainingSessionController.php
+@@ -160,8 +160,14 @@ private function resolveExercise(?string $exerciseId, string $rawName): Exercise
+         }
+ 
+         // Try ExerciseNameMap alias
+-        $map = ExerciseNameMap::where('logged_name', $rawName)->first();
+-        if ($map && $exercise = Exercise::find($map->canonical_exercise_id)) {
++        // Note: the schema column is `original_name` (migration 000002) and the
++        // FK to the canonical Exercise row is `exercise_id` (see
++        // ExerciseNameMap::$fillable / ExerciseNameMap::exercise()). Neither
++        // `logged_name` nor `canonical_exercise_id` has ever existed on this
++        // table -- the former threw a 500 on every unmapped exercise name,
++        // the latter silently no-opped, so this lookup has never succeeded.
++        $map = ExerciseNameMap::where('original_name', $rawName)->first();
++        if ($map && $exercise = Exercise::find($map->exercise_id)) {
+             return $exercise;
+         }
+ 
