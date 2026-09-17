@@ -18,9 +18,6 @@ use Illuminate\Support\Str;
 
 class TrainingSessionController extends Controller
 {
-    /**
-     * Display a listing of training sessions for the authenticated player identity.
-     */
     public function index(Request $request): JsonResponse
     {
         $playerIdentity = $this->resolvePlayerIdentity($request);
@@ -30,21 +27,14 @@ class TrainingSessionController extends Controller
             ->orderBy('session_date', 'desc')
             ->paginate($request->get('per_page', 15));
 
-        return response()->json([
-            'status' => 'success',
-            'data'   => $sessions,
-        ]);
+        return response()->json(['status' => 'success', 'data' => $sessions]);
     }
 
-    /**
-     * Store a new training session payload synced from Momentum PWA.
-     */
     public function store(StoreTrainingSessionRequest $request): JsonResponse
     {
         $validated = $request->validated();
         $playerIdentity = $this->resolvePlayerIdentity($request, $validated['player_identity_id'] ?? null);
 
-        // Resolve active training phase for date
         $phase = TrainingPhase::where('player_identity_id', $playerIdentity->id)
             ->where('start_date', '<=', $validated['session_date'])
             ->where(function ($query) use ($validated) {
@@ -54,7 +44,6 @@ class TrainingSessionController extends Controller
             ->first();
 
         $session = DB::transaction(function () use ($validated, $playerIdentity, $phase) {
-            // 1. Create Training Session
             $session = TrainingSession::create([
                 'id'                 => (string) Str::uuid(),
                 'phase_id'           => $phase?->id,
@@ -67,7 +56,6 @@ class TrainingSessionController extends Controller
                 'rpe_overall'        => $validated['rpe_overall'] ?? null,
             ]);
 
-            // 2. Process Sets and Check PRs
             foreach ($validated['sets'] as $setPayload) {
                 $exercise = $this->resolveExercise($setPayload['exercise_id'] ?? null, $setPayload['exercise_name']);
 
@@ -85,7 +73,6 @@ class TrainingSessionController extends Controller
                     'set_notes'        => $setPayload['set_notes'] ?? null,
                 ]);
 
-                // Check for Personal Records
                 $this->evaluatePersonalRecord($playerIdentity, $session, $exercise, $set);
             }
 
@@ -104,22 +91,15 @@ class TrainingSessionController extends Controller
         ], 201);
     }
 
-    /**
-     * Display a specific session with detailed set logs.
-     */
     public function show(TrainingSession $session): JsonResponse
     {
         $this->authorize('view', $session);
-
         return response()->json([
             'status' => 'success',
             'data'   => $session->load(['sets.exercise', 'phase', 'playerIdentity']),
         ]);
     }
 
-    /**
-     * Resolve the PlayerIdentity associated with the authenticated user or payload.
-     */
     private function resolvePlayerIdentity(Request $request, ?string $explicitId = null): PlayerIdentity
     {
         if ($explicitId) {
@@ -127,12 +107,9 @@ class TrainingSessionController extends Controller
         }
 
         $user = $request->user();
-
-        // Check if user has an associated PlayerIdentity (ADR-001)
         $playerIdentity = PlayerIdentity::where('user_id', $user->id)->first();
 
         if (!$playerIdentity) {
-            // Auto-create claimed player identity if first-time user
             $playerIdentity = PlayerIdentity::create([
                 'id'           => (string) Str::uuid(),
                 'player_code'  => 'PLR-' . strtoupper(Str::random(8)),
@@ -147,6 +124,9 @@ class TrainingSessionController extends Controller
 
     /**
      * Resolve Exercise model using UUID or canonical/mapped name.
+     * Patch: bulldog_exercise_resolve_fix.patch
+     *   logged_name          -> original_name   (actual migration 000002 column)
+     *   canonical_exercise_id -> exercise_id    (actual FK column)
      */
     private function resolveExercise(?string $exerciseId, string $rawName): Exercise
     {
@@ -154,24 +134,15 @@ class TrainingSessionController extends Controller
             return $exercise;
         }
 
-        // Try exact canonical match
         if ($exercise = Exercise::where('canonical_name', $rawName)->first()) {
             return $exercise;
         }
 
-        // Try ExerciseNameMap alias
-        // Note: the schema column is `original_name` (migration 000002) and the
-        // FK to the canonical Exercise row is `exercise_id` (see
-        // ExerciseNameMap::$fillable / ExerciseNameMap::exercise()). Neither
-        // `logged_name` nor `canonical_exercise_id` has ever existed on this
-        // table -- the former threw a 500 on every unmapped exercise name,
-        // the latter silently no-opped, so this lookup has never succeeded.
         $map = ExerciseNameMap::where('original_name', $rawName)->first();
         if ($map && $exercise = Exercise::find($map->exercise_id)) {
             return $exercise;
         }
 
-        // Fallback: create new exercise in library
         return Exercise::create([
             'id'             => (string) Str::uuid(),
             'canonical_name' => $rawName,
@@ -179,12 +150,8 @@ class TrainingSessionController extends Controller
         ]);
     }
 
-    /**
-     * Evaluate if a completed set breaks a Personal Record.
-     */
     private function evaluatePersonalRecord(PlayerIdentity $player, TrainingSession $session, Exercise $exercise, TrainingSet $set): void
     {
-        // 1. Weight PR Check
         if ($set->weight_lbs > 0 && ($set->reps > 0 || $set->duration_seconds > 0)) {
             $existingWeightPr = PlayerPr::where('player_identity_id', $player->id)
                 ->where('exercise_id', $exercise->id)
@@ -193,11 +160,7 @@ class TrainingSessionController extends Controller
 
             if (!$existingWeightPr || $set->weight_lbs > $existingWeightPr->pr_value) {
                 PlayerPr::updateOrCreate(
-                    [
-                        'player_identity_id' => $player->id,
-                        'exercise_id'        => $exercise->id,
-                        'pr_type'            => 'Heaviest Weight',
-                    ],
+                    ['player_identity_id' => $player->id, 'exercise_id' => $exercise->id, 'pr_type' => 'Heaviest Weight'],
                     [
                         'id'            => (string) Str::uuid(),
                         'pr_value'      => $set->weight_lbs,
@@ -212,7 +175,6 @@ class TrainingSessionController extends Controller
             }
         }
 
-        // 2. Duration PR Check (for timed carries/holds)
         if ($set->duration_seconds > 0) {
             $existingDurationPr = PlayerPr::where('player_identity_id', $player->id)
                 ->where('exercise_id', $exercise->id)
@@ -221,11 +183,7 @@ class TrainingSessionController extends Controller
 
             if (!$existingDurationPr || $set->duration_seconds > $existingDurationPr->pr_value) {
                 PlayerPr::updateOrCreate(
-                    [
-                        'player_identity_id' => $player->id,
-                        'exercise_id'        => $exercise->id,
-                        'pr_type'            => 'Longest Duration',
-                    ],
+                    ['player_identity_id' => $player->id, 'exercise_id' => $exercise->id, 'pr_type' => 'Longest Duration'],
                     [
                         'id'            => (string) Str::uuid(),
                         'pr_value'      => $set->duration_seconds,
