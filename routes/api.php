@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\Teams\TeamController;
 use App\Http\Controllers\Api\V1\Training\CoachController;
 use App\Http\Controllers\Api\V1\Training\TrainingSessionController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\V1\Training\ExerciseController;
 
 Route::middleware('auth:sanctum')->group(function () {
     // Team management endpoints
@@ -30,4 +31,5 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
     Route::post('/imports', [HistoricalImportApiController::class, 'store']);
     Route::post('/imports/{import}/confirm', [HistoricalImportApiController::class, 'confirm']);
     Route::get('/imports/{import}', [HistoricalImportApiController::class, 'show']);
+    Route::get('/exercises', [ExerciseController::class, 'index']);
 });
