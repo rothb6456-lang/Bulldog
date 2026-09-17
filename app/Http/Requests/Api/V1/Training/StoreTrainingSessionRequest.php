@@ -25,7 +25,7 @@ class StoreTrainingSessionRequest extends FormRequest
             'sets'                   => ['required', 'array', 'min:1'],
             'sets.*.exercise_name'   => ['required', 'string'],
             'sets.*.exercise_id'     => ['nullable', 'string', 'exists:exercises,id'],
-            'sets.*.section'         => ['nullable', 'string', 'in:primary,warmup,cooldown,accessory'],
+            'sets.*.section'         => ['nullable', 'string', 'in:primary,warmup,cooldown,accessory,optional'],
             'sets.*.set_number'      => ['required', 'integer', 'min:1'],
             'sets.*.weight_lbs'      => ['nullable', 'numeric', 'min:0'],
             'sets.*.reps'            => ['nullable', 'integer', 'min:0'],
@@ -36,3 +36,6 @@ class StoreTrainingSessionRequest extends FormRequest
         ];
     }
 }
+^X
+x
+
