@@ -1,0 +1,840 @@
+diff --git a/app/Actions/Admin/MergePlayerIdentitiesAction.php b/app/Actions/Admin/MergePlayerIdentitiesAction.php
+index 5e5e168..da37a92 100644
+--- a/app/Actions/Admin/MergePlayerIdentitiesAction.php
++++ b/app/Actions/Admin/MergePlayerIdentitiesAction.php
+@@ -18,6 +18,11 @@
+ use App\Models\AchievementAward;
+ use App\Models\Streak;
+ use App\Models\TimelineEntry;
++use App\Models\PlayerTrainingProfile;
++use App\Models\PlayerTrainingGoal;
++use App\Models\PlayerEquipmentAccess;
++use App\Models\PlayerTrainingGuardrail;
++use App\Models\PlayerCoachLink;
+ use App\Actions\Scoring\RecalculateGameStatsAction;
+ use App\Actions\Imports\RecalculateHistoricalAggregatesAction; // Wave 5 rebuild service
+ use App\Services\Audit\AuditLogService;
+@@ -150,6 +155,77 @@ public function execute(string $canonicalId, string $duplicateId, string $userId
+             // Clean up duplicate streaks
+             Streak::where('subject_type', 'player')->where('subject_id', $duplicateId)->delete();
+ 
++            // 8.5. Re-target Momentum training profile, goals, equipment access, guardrails, and coach links.
++            // This must happen before the duplicate identity is deleted below (step 10) -- these tables'
++            // player_identity_id foreign keys cascadeOnDelete, so skipping this step would silently
++            // destroy the athlete's training data on merge.
++
++            // Profile is 1:1; canonical's copy wins if both exist, duplicate's copy is discarded.
++            if (PlayerTrainingProfile::where('player_identity_id', $canonicalId)->exists()) {
++                $removedProfile = PlayerTrainingProfile::where('player_identity_id', $duplicateId)->first();
++                if ($removedProfile) {
++                    $removedProfile->delete();
++                    $manifest['removed_duplicates'][] = "player_training_profile:{$removedProfile->id}";
++                }
++            } else {
++                $retargetedProfile = PlayerTrainingProfile::where('player_identity_id', $duplicateId)
++                    ->update(['player_identity_id' => $canonicalId]);
++                if ($retargetedProfile) {
++                    $manifest['re-targeted'][] = "player_training_profile:{$retargetedProfile}";
++                }
++            }
++
++            // Goals and guardrails intentionally preserve history (e.g., a resolved guardrail years
++            // before a new, unrelated one) -- no dedup, straightforward bulk re-target.
++            $retargetedGoals = PlayerTrainingGoal::where('player_identity_id', $duplicateId)
++                ->update(['player_identity_id' => $canonicalId]);
++            $manifest['re-targeted'][] = "player_training_goals:{$retargetedGoals}";
++
++            $retargetedGuardrails = PlayerTrainingGuardrail::where('player_identity_id', $duplicateId)
++                ->update(['player_identity_id' => $canonicalId]);
++            $manifest['re-targeted'][] = "player_training_guardrails:{$retargetedGuardrails}";
++
++            // Equipment access is hard-unique on (player_identity_id, equipment_type); a blind bulk
++            // update would violate that constraint on overlapping equipment, so check per-row.
++            $dupEquipment = PlayerEquipmentAccess::where('player_identity_id', $duplicateId)->get();
++            foreach ($dupEquipment as $dupItem) {
++                $exists = PlayerEquipmentAccess::where('player_identity_id', $canonicalId)
++                    ->where('equipment_type', $dupItem->equipment_type)
++                    ->first();
++
++                if ($exists) {
++                    $dupItem->delete();
++                    $manifest['removed_duplicates'][] = "player_equipment_access:{$dupItem->id}";
++                } else {
++                    $dupItem->player_identity_id = $canonicalId;
++                    $dupItem->save();
++                    $manifest['re-targeted'][] = "player_equipment_access:{$dupItem->id}";
++                }
++            }
++
++            // Coach links are unique on (coach_user_id, player_identity_id); same per-row check,
++            // preferring an already-active link over a merged-in pending/revoked duplicate.
++            $dupCoachLinks = PlayerCoachLink::where('player_identity_id', $duplicateId)->get();
++            foreach ($dupCoachLinks as $dupLink) {
++                $exists = PlayerCoachLink::where('player_identity_id', $canonicalId)
++                    ->where('coach_user_id', $dupLink->coach_user_id)
++                    ->first();
++
++                if ($exists) {
++                    if ($exists->status !== 'active' && $dupLink->status === 'active') {
++                        $exists->status = 'active';
++                        $exists->responded_at = $dupLink->responded_at;
++                        $exists->save();
++                    }
++                    $dupLink->delete();
++                    $manifest['removed_duplicates'][] = "player_coach_link:{$dupLink->id}";
++                } else {
++                    $dupLink->player_identity_id = $canonicalId;
++                    $dupLink->save();
++                    $manifest['re-targeted'][] = "player_coach_link:{$dupLink->id}";
++                }
++            }
++
+             // 9. Generate official PlayerIdentityMerge Ledger Record
+             $mergeRecord = PlayerIdentityMerge::create([
+                 'canonical_identity_id' => $canonicalId,
+diff --git a/app/Models/PlayerCoachLink.php b/app/Models/PlayerCoachLink.php
+new file mode 100644
+index 0000000..9fb777f
+--- /dev/null
++++ b/app/Models/PlayerCoachLink.php
+@@ -0,0 +1,43 @@
++<?php
++
++namespace App\Models;
++
++use App\Traits\HasUuid;
++use Illuminate\Database\Eloquent\Factories\HasFactory;
++use Illuminate\Database\Eloquent\Model;
++use Illuminate\Database\Eloquent\Relations\BelongsTo;
++
++class PlayerCoachLink extends Model
++{
++    use HasFactory, HasUuid;
++
++    protected $keyType = 'string';
++    public $incrementing = false;
++
++    protected $fillable = [
++        'coach_user_id',
++        'player_identity_id',
++        'status',
++        'invited_by',
++        'responded_at',
++    ];
++
++    protected $casts = [
++        'responded_at' => 'datetime',
++    ];
++
++    public function coach(): BelongsTo
++    {
++        return $this->belongsTo(User::class, 'coach_user_id');
++    }
++
++    public function playerIdentity(): BelongsTo
++    {
++        return $this->belongsTo(PlayerIdentity::class, 'player_identity_id');
++    }
++
++    public function isActive(): bool
++    {
++        return $this->status === 'active';
++    }
++}
+diff --git a/app/Models/PlayerEquipmentAccess.php b/app/Models/PlayerEquipmentAccess.php
+new file mode 100644
+index 0000000..2482110
+--- /dev/null
++++ b/app/Models/PlayerEquipmentAccess.php
+@@ -0,0 +1,27 @@
++<?php
++
++namespace App\Models;
++
++use App\Traits\HasUuid;
++use Illuminate\Database\Eloquent\Factories\HasFactory;
++use Illuminate\Database\Eloquent\Model;
++use Illuminate\Database\Eloquent\Relations\BelongsTo;
++
++class PlayerEquipmentAccess extends Model
++{
++    use HasFactory, HasUuid;
++
++    protected $keyType = 'string';
++    public $incrementing = false;
++
++    protected $fillable = [
++        'player_identity_id',
++        'equipment_type',
++        'facility_label',
++    ];
++
++    public function playerIdentity(): BelongsTo
++    {
++        return $this->belongsTo(PlayerIdentity::class, 'player_identity_id');
++    }
++}
+diff --git a/app/Models/PlayerIdentity.php b/app/Models/PlayerIdentity.php
+index 2d1082e..b7d9822 100644
+--- a/app/Models/PlayerIdentity.php
++++ b/app/Models/PlayerIdentity.php
+@@ -6,6 +6,8 @@
+ use Illuminate\Database\Eloquent\Factories\HasFactory;
+ use Illuminate\Database\Eloquent\Model;
+ use Illuminate\Database\Eloquent\Relations\BelongsTo;
++use Illuminate\Database\Eloquent\Relations\HasMany;
++use Illuminate\Database\Eloquent\Relations\HasOne;
+ 
+ class PlayerIdentity extends Model
+ {
+@@ -38,4 +40,44 @@ public function creator(): BelongsTo
+     {
+         return $this->belongsTo(User::class, 'created_by_user_id');
+     }
++
++    /**
++     * Momentum: the athlete's lean settings profile (1:1).
++     */
++    public function trainingProfile(): HasOne
++    {
++        return $this->hasOne(PlayerTrainingProfile::class, 'player_identity_id');
++    }
++
++    /**
++     * Momentum: long-term and phase-scoped training goals.
++     */
++    public function trainingGoals(): HasMany
++    {
++        return $this->hasMany(PlayerTrainingGoal::class, 'player_identity_id');
++    }
++
++    /**
++     * Momentum: declared equipment/facility access.
++     */
++    public function equipmentAccess(): HasMany
++    {
++        return $this->hasMany(PlayerEquipmentAccess::class, 'player_identity_id');
++    }
++
++    /**
++     * Momentum: durable training guardrails/limitations (active and historical).
++     */
++    public function trainingGuardrails(): HasMany
++    {
++        return $this->hasMany(PlayerTrainingGuardrail::class, 'player_identity_id');
++    }
++
++    /**
++     * Momentum: coach/PT links where this identity is the athlete being coached.
++     */
++    public function coachLinks(): HasMany
++    {
++        return $this->hasMany(PlayerCoachLink::class, 'player_identity_id');
++    }
+ }
+\ No newline at end of file
+diff --git a/app/Models/PlayerTrainingGoal.php b/app/Models/PlayerTrainingGoal.php
+new file mode 100644
+index 0000000..d268960
+--- /dev/null
++++ b/app/Models/PlayerTrainingGoal.php
+@@ -0,0 +1,65 @@
++<?php
++
++namespace App\Models;
++
++use App\Traits\HasUuid;
++use Illuminate\Database\Eloquent\Factories\HasFactory;
++use Illuminate\Database\Eloquent\Model;
++use Illuminate\Database\Eloquent\Relations\BelongsTo;
++
++class PlayerTrainingGoal extends Model
++{
++    use HasFactory, HasUuid;
++
++    protected $keyType = 'string';
++    public $incrementing = false;
++
++    protected $fillable = [
++        'player_identity_id',
++        'phase_id',
++        'goal_template_id',
++        'title',
++        'description',
++        'target_metric_key',
++        'target_value',
++        'target_unit',
++        'start_date',
++        'target_date',
++        'status',
++        'achieved_at',
++        'source',
++        'created_by_user_id',
++    ];
++
++    protected $casts = [
++        'target_value' => 'float',
++        'start_date' => 'date',
++        'target_date' => 'date',
++        'achieved_at' => 'datetime',
++    ];
++
++    public function playerIdentity(): BelongsTo
++    {
++        return $this->belongsTo(PlayerIdentity::class, 'player_identity_id');
++    }
++
++    public function phase(): BelongsTo
++    {
++        return $this->belongsTo(TrainingPhase::class, 'phase_id');
++    }
++
++    public function template(): BelongsTo
++    {
++        return $this->belongsTo(TrainingGoalTemplate::class, 'goal_template_id');
++    }
++
++    public function createdBy(): BelongsTo
++    {
++        return $this->belongsTo(User::class, 'created_by_user_id');
++    }
++
++    public function isLongTerm(): bool
++    {
++        return $this->phase_id === null;
++    }
++}
+diff --git a/app/Models/PlayerTrainingGuardrail.php b/app/Models/PlayerTrainingGuardrail.php
+new file mode 100644
+index 0000000..98a66d4
+--- /dev/null
++++ b/app/Models/PlayerTrainingGuardrail.php
+@@ -0,0 +1,50 @@
++<?php
++
++namespace App\Models;
++
++use App\Traits\HasUuid;
++use Illuminate\Database\Eloquent\Factories\HasFactory;
++use Illuminate\Database\Eloquent\Model;
++use Illuminate\Database\Eloquent\Relations\BelongsTo;
++
++class PlayerTrainingGuardrail extends Model
++{
++    use HasFactory, HasUuid;
++
++    protected $keyType = 'string';
++    public $incrementing = false;
++
++    protected $fillable = [
++        'player_identity_id',
++        'body_region',
++        'restricted_movement_patterns',
++        'restriction_type',
++        'description',
++        'status',
++        'source',
++        'created_by_user_id',
++        'first_noted_date',
++        'resolved_date',
++    ];
++
++    protected $casts = [
++        'restricted_movement_patterns' => 'array',
++        'first_noted_date' => 'date',
++        'resolved_date' => 'date',
++    ];
++
++    public function playerIdentity(): BelongsTo
++    {
++        return $this->belongsTo(PlayerIdentity::class, 'player_identity_id');
++    }
++
++    public function createdBy(): BelongsTo
++    {
++        return $this->belongsTo(User::class, 'created_by_user_id');
++    }
++
++    public function isActive(): bool
++    {
++        return $this->status === 'active';
++    }
++}
+diff --git a/app/Models/PlayerTrainingProfile.php b/app/Models/PlayerTrainingProfile.php
+new file mode 100644
+index 0000000..3eb3bce
+--- /dev/null
++++ b/app/Models/PlayerTrainingProfile.php
+@@ -0,0 +1,27 @@
++<?php
++
++namespace App\Models;
++
++use App\Traits\HasUuid;
++use Illuminate\Database\Eloquent\Factories\HasFactory;
++use Illuminate\Database\Eloquent\Model;
++use Illuminate\Database\Eloquent\Relations\BelongsTo;
++
++class PlayerTrainingProfile extends Model
++{
++    use HasFactory, HasUuid;
++
++    protected $keyType = 'string';
++    public $incrementing = false;
++
++    protected $fillable = [
++        'player_identity_id',
++        'experience_level',
++        'notes',
++    ];
++
++    public function playerIdentity(): BelongsTo
++    {
++        return $this->belongsTo(PlayerIdentity::class, 'player_identity_id');
++    }
++}
+diff --git a/app/Models/TrainingGoalTemplate.php b/app/Models/TrainingGoalTemplate.php
+new file mode 100644
+index 0000000..4929ba5
+--- /dev/null
++++ b/app/Models/TrainingGoalTemplate.php
+@@ -0,0 +1,35 @@
++<?php
++
++namespace App\Models;
++
++use App\Traits\HasUuid;
++use Illuminate\Database\Eloquent\Factories\HasFactory;
++use Illuminate\Database\Eloquent\Model;
++use Illuminate\Database\Eloquent\Relations\HasMany;
++
++class TrainingGoalTemplate extends Model
++{
++    use HasFactory, HasUuid;
++
++    protected $keyType = 'string';
++    public $incrementing = false;
++
++    protected $fillable = [
++        'code',
++        'title',
++        'description',
++        'category',
++        'metric_key',
++        'default_target_unit',
++        'is_active',
++    ];
++
++    protected $casts = [
++        'is_active' => 'boolean',
++    ];
++
++    public function goals(): HasMany
++    {
++        return $this->hasMany(PlayerTrainingGoal::class, 'goal_template_id');
++    }
++}
+diff --git a/database/migrations/2026_09_19_170001_create_player_training_profiles_table.php b/database/migrations/2026_09_19_170001_create_player_training_profiles_table.php
+new file mode 100644
+index 0000000..1ea2811
+--- /dev/null
++++ b/database/migrations/2026_09_19_170001_create_player_training_profiles_table.php
+@@ -0,0 +1,35 @@
++<?php
++
++use Illuminate\Database\Migrations\Migration;
++use Illuminate\Database\Schema\Blueprint;
++use Illuminate\Support\Facades\Schema;
++
++return new class extends Migration
++{
++    /**
++     * Run the migrations.
++     */
++    public function up(): void
++    {
++        Schema::create('player_training_profiles', function (Blueprint $table) {
++            $table->uuid('id')->primary();
++            $table->uuid('player_identity_id')->unique(); // 1:1 with player_identities
++            $table->string('experience_level', 50)->nullable()->index(); // beginner, intermediate, advanced
++            $table->text('notes')->nullable();
++            $table->timestamps();
++
++            $table->foreign('player_identity_id')
++                  ->references('id')
++                  ->on('player_identities')
++                  ->cascadeOnDelete();
++        });
++    }
++
++    /**
++     * Reverse the migrations.
++     */
++    public function down(): void
++    {
++        Schema::dropIfExists('player_training_profiles');
++    }
++};
+diff --git a/database/migrations/2026_09_19_170002_create_training_goal_templates_table.php b/database/migrations/2026_09_19_170002_create_training_goal_templates_table.php
+new file mode 100644
+index 0000000..6c5e252
+--- /dev/null
++++ b/database/migrations/2026_09_19_170002_create_training_goal_templates_table.php
+@@ -0,0 +1,34 @@
++<?php
++
++use Illuminate\Database\Migrations\Migration;
++use Illuminate\Database\Schema\Blueprint;
++use Illuminate\Support\Facades\Schema;
++
++return new class extends Migration
++{
++    /**
++     * Run the migrations.
++     */
++    public function up(): void
++    {
++        Schema::create('training_goal_templates', function (Blueprint $table) {
++            $table->uuid('id')->primary();
++            $table->string('code', 50)->unique(); // e.g., CONSISTENCY_4WK, SQUAT_1RM_PLUS10
++            $table->string('title');
++            $table->text('description')->nullable();
++            $table->string('category', 100)->index(); // strength, hypertrophy, consistency, mobility, endurance, return_to_play
++            $table->string('metric_key', 100)->nullable(); // e.g., exercise_1rm, sessions_per_week, bodyweight -- null for qualitative goals
++            $table->string('default_target_unit', 20)->nullable(); // lbs, sessions, weeks
++            $table->boolean('is_active')->default(true)->index();
++            $table->timestamps();
++        });
++    }
++
++    /**
++     * Reverse the migrations.
++     */
++    public function down(): void
++    {
++        Schema::dropIfExists('training_goal_templates');
++    }
++};
+diff --git a/database/migrations/2026_09_19_170003_create_player_training_goals_table.php b/database/migrations/2026_09_19_170003_create_player_training_goals_table.php
+new file mode 100644
+index 0000000..7a31af4
+--- /dev/null
++++ b/database/migrations/2026_09_19_170003_create_player_training_goals_table.php
+@@ -0,0 +1,67 @@
++<?php
++
++use Illuminate\Database\Migrations\Migration;
++use Illuminate\Database\Schema\Blueprint;
++use Illuminate\Support\Facades\Schema;
++
++return new class extends Migration
++{
++    /**
++     * Run the migrations.
++     */
++    public function up(): void
++    {
++        Schema::create('player_training_goals', function (Blueprint $table) {
++            $table->uuid('id')->primary();
++            $table->uuid('player_identity_id')->index();
++            $table->uuid('phase_id')->nullable()->index(); // null = long-term / standing goal, not tied to one phase
++            $table->uuid('goal_template_id')->nullable()->index(); // null = fully custom goal
++
++            $table->string('title'); // denormalized display text: template title or custom text
++            $table->text('description')->nullable();
++
++            $table->string('target_metric_key', 100)->nullable();
++            $table->decimal('target_value', 8, 2)->nullable();
++            $table->string('target_unit', 20)->nullable();
++
++            $table->date('start_date')->nullable();
++            $table->date('target_date')->nullable();
++
++            $table->string('status', 20)->default('active')->index(); // active, achieved, abandoned, expired
++            $table->timestamp('achieved_at')->nullable();
++
++            $table->string('source', 20)->default('self')->index(); // self, coach
++            $table->uuid('created_by_user_id')->nullable()->index();
++
++            $table->timestamps();
++
++            $table->foreign('player_identity_id')
++                  ->references('id')
++                  ->on('player_identities')
++                  ->cascadeOnDelete();
++
++            $table->foreign('phase_id')
++                  ->references('id')
++                  ->on('training_phases')
++                  ->nullOnDelete();
++
++            $table->foreign('goal_template_id')
++                  ->references('id')
++                  ->on('training_goal_templates')
++                  ->nullOnDelete();
++
++            $table->foreign('created_by_user_id')
++                  ->references('id')
++                  ->on('users')
++                  ->nullOnDelete();
++        });
++    }
++
++    /**
++     * Reverse the migrations.
++     */
++    public function down(): void
++    {
++        Schema::dropIfExists('player_training_goals');
++    }
++};
+diff --git a/database/migrations/2026_09_19_170004_create_player_equipment_access_table.php b/database/migrations/2026_09_19_170004_create_player_equipment_access_table.php
+new file mode 100644
+index 0000000..d0a42fa
+--- /dev/null
++++ b/database/migrations/2026_09_19_170004_create_player_equipment_access_table.php
+@@ -0,0 +1,38 @@
++<?php
++
++use Illuminate\Database\Migrations\Migration;
++use Illuminate\Database\Schema\Blueprint;
++use Illuminate\Support\Facades\Schema;
++
++return new class extends Migration
++{
++    /**
++     * Run the migrations.
++     */
++    public function up(): void
++    {
++        Schema::create('player_equipment_access', function (Blueprint $table) {
++            $table->uuid('id')->primary();
++            $table->uuid('player_identity_id')->index();
++            $table->string('equipment_type', 100)->index(); // matches exercises.equipment_type vocabulary
++            $table->string('facility_label')->nullable(); // e.g., "Home", "Planet Fitness" -- informational only
++            $table->timestamps();
++
++            $table->foreign('player_identity_id')
++                  ->references('id')
++                  ->on('player_identities')
++                  ->cascadeOnDelete();
++
++            // Hard dedup guard: no historical value in keeping duplicate equipment rows
++            $table->unique(['player_identity_id', 'equipment_type']);
++        });
++    }
++
++    /**
++     * Reverse the migrations.
++     */
++    public function down(): void
++    {
++        Schema::dropIfExists('player_equipment_access');
++    }
++};
+diff --git a/database/migrations/2026_09_19_170005_create_player_training_guardrails_table.php b/database/migrations/2026_09_19_170005_create_player_training_guardrails_table.php
+new file mode 100644
+index 0000000..9ff5c3f
+--- /dev/null
++++ b/database/migrations/2026_09_19_170005_create_player_training_guardrails_table.php
+@@ -0,0 +1,56 @@
++<?php
++
++use Illuminate\Database\Migrations\Migration;
++use Illuminate\Database\Schema\Blueprint;
++use Illuminate\Support\Facades\Schema;
++
++return new class extends Migration
++{
++    /**
++     * Run the migrations.
++     */
++    public function up(): void
++    {
++        Schema::create('player_training_guardrails', function (Blueprint $table) {
++            $table->uuid('id')->primary();
++            $table->uuid('player_identity_id')->index();
++
++            $table->string('body_region', 100)->index(); // shoulder, elbow, wrist, low_back, hip, knee, ankle, etc.
++            $table->json('restricted_movement_patterns')->nullable(); // array of exercises.movement_pattern values to avoid/caution
++            $table->string('restriction_type', 20)->default('avoid'); // avoid, modify, monitor
++
++            $table->text('description')->nullable(); // free-text elaboration (e.g., "2019 rotator cuff repair")
++
++            $table->string('status', 20)->default('active')->index(); // active, resolved
++            $table->string('source', 20)->default('self')->index(); // self, coach
++            $table->uuid('created_by_user_id')->nullable()->index();
++
++            $table->date('first_noted_date')->nullable();
++            $table->date('resolved_date')->nullable();
++
++            $table->timestamps();
++
++            $table->foreign('player_identity_id')
++                  ->references('id')
++                  ->on('player_identities')
++                  ->cascadeOnDelete();
++
++            $table->foreign('created_by_user_id')
++                  ->references('id')
++                  ->on('users')
++                  ->nullOnDelete();
++
++            // Deliberately no unique constraint here -- guardrail history (resolved + new,
++            // same body region, different cause years apart) is a legitimate use case, not a duplicate.
++            // Dedup against exact ACTIVE duplicates is a UI-level concern, not a schema-level one.
++        });
++    }
++
++    /**
++     * Reverse the migrations.
++     */
++    public function down(): void
++    {
++        Schema::dropIfExists('player_training_guardrails');
++    }
++};
+diff --git a/database/migrations/2026_09_19_170006_create_player_coach_links_table.php b/database/migrations/2026_09_19_170006_create_player_coach_links_table.php
+new file mode 100644
+index 0000000..977877a
+--- /dev/null
++++ b/database/migrations/2026_09_19_170006_create_player_coach_links_table.php
+@@ -0,0 +1,47 @@
++<?php
++
++use Illuminate\Database\Migrations\Migration;
++use Illuminate\Database\Schema\Blueprint;
++use Illuminate\Support\Facades\Schema;
++
++return new class extends Migration
++{
++    /**
++     * Run the migrations.
++     */
++    public function up(): void
++    {
++        Schema::create('player_coach_links', function (Blueprint $table) {
++            $table->uuid('id')->primary();
++            $table->uuid('coach_user_id')->index();
++            $table->uuid('player_identity_id')->index();
++
++            $table->string('status', 20)->default('pending')->index(); // pending, active, revoked
++            $table->string('invited_by', 20)->default('coach'); // coach, athlete
++            $table->timestamp('responded_at')->nullable();
++
++            $table->timestamps();
++
++            $table->foreign('coach_user_id')
++                  ->references('id')
++                  ->on('users')
++                  ->cascadeOnDelete();
++
++            $table->foreign('player_identity_id')
++                  ->references('id')
++                  ->on('player_identities')
++                  ->cascadeOnDelete();
++
++            // A coach can only have one link record per athlete
++            $table->unique(['coach_user_id', 'player_identity_id']);
++        });
++    }
++
++    /**
++     * Reverse the migrations.
++     */
++    public function down(): void
++    {
++        Schema::dropIfExists('player_coach_links');
++    }
++};
+diff --git a/database/seeders/DatabaseSeeder.php b/database/seeders/DatabaseSeeder.php
+index f324bed..faee50d 100644
+--- a/database/seeders/DatabaseSeeder.php
++++ b/database/seeders/DatabaseSeeder.php
+@@ -15,6 +15,7 @@ public function run(): void
+             SportSeeder::class,
+             RulesetSeeder::class,
+             SystemBadgeSeeder::class,
++            TrainingGoalTemplateSeeder::class,
+         ]);
+     }
+ }
+diff --git a/database/seeders/TrainingGoalTemplateSeeder.php b/database/seeders/TrainingGoalTemplateSeeder.php
+new file mode 100644
+index 0000000..d947935
+--- /dev/null
++++ b/database/seeders/TrainingGoalTemplateSeeder.php
+@@ -0,0 +1,73 @@
++<?php
++
++namespace Database\Seeders;
++
++use App\Models\TrainingGoalTemplate;
++use Illuminate\Database\Seeder;
++
++class TrainingGoalTemplateSeeder extends Seeder
++{
++    /**
++     * Run the database seeds.
++     */
++    public function run(): void
++    {
++        $templates = [
++            [
++                'code' => 'CONSISTENCY_4WK',
++                'title' => 'Train consistently for 4 weeks',
++                'description' => 'Complete your planned sessions each week for a full month.',
++                'category' => 'consistency',
++                'metric_key' => 'sessions_per_week',
++                'default_target_unit' => 'sessions',
++            ],
++            [
++                'code' => 'STRENGTH_1RM_PLUS',
++                'title' => 'Increase a lift\'s working max',
++                'description' => 'Add measurable load to a key lift over the course of a phase.',
++                'category' => 'strength',
++                'metric_key' => 'exercise_1rm',
++                'default_target_unit' => 'lbs',
++            ],
++            [
++                'code' => 'BODYWEIGHT_TARGET',
++                'title' => 'Reach a target bodyweight',
++                'description' => 'Move toward a target bodyweight in support of a broader goal.',
++                'category' => 'general_fitness',
++                'metric_key' => 'bodyweight',
++                'default_target_unit' => 'lbs',
++            ],
++            [
++                'code' => 'RETURN_TO_PLAY',
++                'title' => 'Return to play after injury',
++                'description' => 'Progress rehab work toward full clearance for sport participation.',
++                'category' => 'return_to_play',
++                'metric_key' => null,
++                'default_target_unit' => null,
++            ],
++            [
++                'code' => 'MOBILITY_IMPROVEMENT',
++                'title' => 'Improve mobility in a problem area',
++                'description' => 'Build range of motion and control in a specific joint or movement.',
++                'category' => 'mobility',
++                'metric_key' => null,
++                'default_target_unit' => null,
++            ],
++            [
++                'code' => 'GENERAL_FITNESS',
++                'title' => 'General fitness and health',
++                'description' => 'No specific performance target -- just building a sustainable training habit.',
++                'category' => 'general_fitness',
++                'metric_key' => null,
++                'default_target_unit' => null,
++            ],
++        ];
++
++        foreach ($templates as $template) {
++            TrainingGoalTemplate::updateOrCreate(
++                ['code' => $template['code']],
++                $template + ['is_active' => true]
++            );
++        }
++    }
++}

@@ -18,6 +18,11 @@ use App\Models\Milestone;
 use App\Models\AchievementAward;
 use App\Models\Streak;
 use App\Models\TimelineEntry;
+use App\Models\PlayerTrainingProfile;
+use App\Models\PlayerTrainingGoal;
+use App\Models\PlayerEquipmentAccess;
+use App\Models\PlayerTrainingGuardrail;
+use App\Models\PlayerCoachLink;
 use App\Actions\Scoring\RecalculateGameStatsAction;
 use App\Actions\Imports\RecalculateHistoricalAggregatesAction; // Wave 5 rebuild service
 use App\Services\Audit\AuditLogService;
@@ -149,6 +154,77 @@ class MergePlayerIdentitiesAction
 
             // Clean up duplicate streaks
             Streak::where('subject_type', 'player')->where('subject_id', $duplicateId)->delete();
+
+            // 8.5. Re-target Momentum training profile, goals, equipment access, guardrails, and coach links.
+            // This must happen before the duplicate identity is deleted below (step 10) -- these tables'
+            // player_identity_id foreign keys cascadeOnDelete, so skipping this step would silently
+            // destroy the athlete's training data on merge.
+
+            // Profile is 1:1; canonical's copy wins if both exist, duplicate's copy is discarded.
+            if (PlayerTrainingProfile::where('player_identity_id', $canonicalId)->exists()) {
+                $removedProfile = PlayerTrainingProfile::where('player_identity_id', $duplicateId)->first();
+                if ($removedProfile) {
+                    $removedProfile->delete();
+                    $manifest['removed_duplicates'][] = "player_training_profile:{$removedProfile->id}";
+                }
+            } else {
+                $retargetedProfile = PlayerTrainingProfile::where('player_identity_id', $duplicateId)
+                    ->update(['player_identity_id' => $canonicalId]);
+                if ($retargetedProfile) {
+                    $manifest['re-targeted'][] = "player_training_profile:{$retargetedProfile}";
+                }
+            }
+
+            // Goals and guardrails intentionally preserve history (e.g., a resolved guardrail years
+            // before a new, unrelated one) -- no dedup, straightforward bulk re-target.
+            $retargetedGoals = PlayerTrainingGoal::where('player_identity_id', $duplicateId)
+                ->update(['player_identity_id' => $canonicalId]);
+            $manifest['re-targeted'][] = "player_training_goals:{$retargetedGoals}";
+
+            $retargetedGuardrails = PlayerTrainingGuardrail::where('player_identity_id', $duplicateId)
+                ->update(['player_identity_id' => $canonicalId]);
+            $manifest['re-targeted'][] = "player_training_guardrails:{$retargetedGuardrails}";
+
+            // Equipment access is hard-unique on (player_identity_id, equipment_type); a blind bulk
+            // update would violate that constraint on overlapping equipment, so check per-row.
+            $dupEquipment = PlayerEquipmentAccess::where('player_identity_id', $duplicateId)->get();
+            foreach ($dupEquipment as $dupItem) {
+                $exists = PlayerEquipmentAccess::where('player_identity_id', $canonicalId)
+                    ->where('equipment_type', $dupItem->equipment_type)
+                    ->first();
+
+                if ($exists) {
+                    $dupItem->delete();
+                    $manifest['removed_duplicates'][] = "player_equipment_access:{$dupItem->id}";
+                } else {
+                    $dupItem->player_identity_id = $canonicalId;
+                    $dupItem->save();
+                    $manifest['re-targeted'][] = "player_equipment_access:{$dupItem->id}";
+                }
+            }
+
+            // Coach links are unique on (coach_user_id, player_identity_id); same per-row check,
+            // preferring an already-active link over a merged-in pending/revoked duplicate.
+            $dupCoachLinks = PlayerCoachLink::where('player_identity_id', $duplicateId)->get();
+            foreach ($dupCoachLinks as $dupLink) {
+                $exists = PlayerCoachLink::where('player_identity_id', $canonicalId)
+                    ->where('coach_user_id', $dupLink->coach_user_id)
+                    ->first();
+
+                if ($exists) {
+                    if ($exists->status !== 'active' && $dupLink->status === 'active') {
+                        $exists->status = 'active';
+                        $exists->responded_at = $dupLink->responded_at;
+                        $exists->save();
+                    }
+                    $dupLink->delete();
+                    $manifest['removed_duplicates'][] = "player_coach_link:{$dupLink->id}";
+                } else {
+                    $dupLink->player_identity_id = $canonicalId;
+                    $dupLink->save();
+                    $manifest['re-targeted'][] = "player_coach_link:{$dupLink->id}";
+                }
+            }
 
             // 9. Generate official PlayerIdentityMerge Ledger Record
             $mergeRecord = PlayerIdentityMerge::create([
