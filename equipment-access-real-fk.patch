@@ -1,0 +1,108 @@
+diff --git a/app/Actions/Admin/MergePlayerIdentitiesAction.php b/app/Actions/Admin/MergePlayerIdentitiesAction.php
+index da37a92..e2c03ab 100644
+--- a/app/Actions/Admin/MergePlayerIdentitiesAction.php
++++ b/app/Actions/Admin/MergePlayerIdentitiesAction.php
+@@ -185,12 +185,18 @@ public function execute(string $canonicalId, string $duplicateId, string $userId
+                 ->update(['player_identity_id' => $canonicalId]);
+             $manifest['re-targeted'][] = "player_training_guardrails:{$retargetedGuardrails}";
+ 
+-            // Equipment access is hard-unique on (player_identity_id, equipment_type); a blind bulk
++            // Equipment access is hard-unique on (player_identity_id, equipment_id); a blind bulk
+             // update would violate that constraint on overlapping equipment, so check per-row.
++            // Custom (non-canonical) entries have a null equipment_id, so those are matched on
++            // custom_label instead — dropping true duplicates, keeping genuinely distinct custom entries.
+             $dupEquipment = PlayerEquipmentAccess::where('player_identity_id', $duplicateId)->get();
+             foreach ($dupEquipment as $dupItem) {
+                 $exists = PlayerEquipmentAccess::where('player_identity_id', $canonicalId)
+-                    ->where('equipment_type', $dupItem->equipment_type)
++                    ->when(
++                        $dupItem->equipment_id,
++                        fn ($q) => $q->where('equipment_id', $dupItem->equipment_id),
++                        fn ($q) => $q->whereNull('equipment_id')->where('custom_label', $dupItem->custom_label)
++                    )
+                     ->first();
+ 
+                 if ($exists) {
+diff --git a/app/Models/PlayerEquipmentAccess.php b/app/Models/PlayerEquipmentAccess.php
+index 2482110..a240291 100644
+--- a/app/Models/PlayerEquipmentAccess.php
++++ b/app/Models/PlayerEquipmentAccess.php
+@@ -16,7 +16,8 @@ class PlayerEquipmentAccess extends Model
+ 
+     protected $fillable = [
+         'player_identity_id',
+-        'equipment_type',
++        'equipment_id',
++        'custom_label',
+         'facility_label',
+     ];
+ 
+@@ -24,4 +25,9 @@ public function playerIdentity(): BelongsTo
+     {
+         return $this->belongsTo(PlayerIdentity::class, 'player_identity_id');
+     }
++
++    public function equipment(): BelongsTo
++    {
++        return $this->belongsTo(Equipment::class, 'equipment_id');
++    }
+ }
+diff --git a/database/migrations/2026_09_20_190001_upgrade_player_equipment_access_to_real_equipment_fk.php b/database/migrations/2026_09_20_190001_upgrade_player_equipment_access_to_real_equipment_fk.php
+new file mode 100644
+index 0000000..2385b95
+--- /dev/null
++++ b/database/migrations/2026_09_20_190001_upgrade_player_equipment_access_to_real_equipment_fk.php
+@@ -0,0 +1,53 @@
++<?php
++
++use Illuminate\Database\Migrations\Migration;
++use Illuminate\Database\Schema\Blueprint;
++use Illuminate\Support\Facades\Schema;
++
++return new class extends Migration
++{
++    /**
++     * player_equipment_access.equipment_type was a loosely-matched string
++     * ("matches exercises.equipment_type vocabulary" per its own comment) built
++     * before a real `equipment` table existed. Now that it does, this points
++     * Momentum's equipment access at the same canonical rows the exercise
++     * library uses. No live data exists in this table yet (Momentum is still
++     * local-storage-only), so this is a clean replacement, not a backfill.
++     *
++     * custom_label stays as an escape hatch for anything a user has that isn't
++     * in the canonical equipment list yet — consistent with the rest of the
++     * app's philosophy of never forcing a user to wait on a curated catalog.
++     */
++    public function up(): void
++    {
++        Schema::table('player_equipment_access', function (Blueprint $table) {
++            $table->uuid('equipment_id')->nullable()->after('player_identity_id');
++            $table->string('custom_label')->nullable()->after('equipment_id');
++
++            $table->foreign('equipment_id')->references('id')->on('equipment')->cascadeOnDelete();
++        });
++
++        Schema::table('player_equipment_access', function (Blueprint $table) {
++            $table->dropUnique(['player_identity_id', 'equipment_type']);
++            $table->dropColumn('equipment_type');
++        });
++
++        Schema::table('player_equipment_access', function (Blueprint $table) {
++            // MySQL treats NULLs as distinct in a unique index, so multiple
++            // custom_label rows (equipment_id NULL) never collide, while real
++            // equipment_id values are still deduped per identity.
++            $table->unique(['player_identity_id', 'equipment_id']);
++        });
++    }
++
++    public function down(): void
++    {
++        Schema::table('player_equipment_access', function (Blueprint $table) {
++            $table->dropUnique(['player_identity_id', 'equipment_id']);
++            $table->dropForeign(['equipment_id']);
++            $table->dropColumn(['equipment_id', 'custom_label']);
++            $table->string('equipment_type', 100)->index();
++            $table->unique(['player_identity_id', 'equipment_type']);
++        });
++    }
++};

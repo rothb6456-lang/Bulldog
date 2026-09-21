@@ -185,12 +185,18 @@ class MergePlayerIdentitiesAction
                 ->update(['player_identity_id' => $canonicalId]);
             $manifest['re-targeted'][] = "player_training_guardrails:{$retargetedGuardrails}";
 
-            // Equipment access is hard-unique on (player_identity_id, equipment_type); a blind bulk
+            // Equipment access is hard-unique on (player_identity_id, equipment_id); a blind bulk
             // update would violate that constraint on overlapping equipment, so check per-row.
+            // Custom (non-canonical) entries have a null equipment_id, so those are matched on
+            // custom_label instead — dropping true duplicates, keeping genuinely distinct custom entries.
             $dupEquipment = PlayerEquipmentAccess::where('player_identity_id', $duplicateId)->get();
             foreach ($dupEquipment as $dupItem) {
                 $exists = PlayerEquipmentAccess::where('player_identity_id', $canonicalId)
-                    ->where('equipment_type', $dupItem->equipment_type)
+                    ->when(
+                        $dupItem->equipment_id,
+                        fn ($q) => $q->where('equipment_id', $dupItem->equipment_id),
+                        fn ($q) => $q->whereNull('equipment_id')->where('custom_label', $dupItem->custom_label)
+                    )
                     ->first();
 
                 if ($exists) {

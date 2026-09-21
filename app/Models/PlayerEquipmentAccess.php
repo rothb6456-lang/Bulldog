@@ -16,12 +16,18 @@ class PlayerEquipmentAccess extends Model
 
     protected $fillable = [
         'player_identity_id',
-        'equipment_type',
+        'equipment_id',
+        'custom_label',
         'facility_label',
     ];
 
     public function playerIdentity(): BelongsTo
     {
         return $this->belongsTo(PlayerIdentity::class, 'player_identity_id');
+    }
+
+    public function equipment(): BelongsTo
+    {
+        return $this->belongsTo(Equipment::class, 'equipment_id');
     }
 }
