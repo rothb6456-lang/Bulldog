@@ -16,6 +16,10 @@ class DatabaseSeeder extends Seeder
             RulesetSeeder::class,
             SystemBadgeSeeder::class,
             TrainingGoalTemplateSeeder::class,
+            EquipmentSeeder::class,
+            BodyStructureSeeder::class,
+            ExerciseSeeder::class,
+            ExerciseNameMapSeeder::class,
         ]);
     }
 }

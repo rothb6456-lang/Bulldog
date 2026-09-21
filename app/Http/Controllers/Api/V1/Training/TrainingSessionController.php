@@ -144,9 +144,9 @@ class TrainingSessionController extends Controller
         }
 
         return Exercise::create([
-            'id'             => (string) Str::uuid(),
-            'canonical_name' => $rawName,
-            'category'       => 'Other',
+            'id'                => (string) Str::uuid(),
+            'canonical_name'    => $rawName,
+            'exercise_category' => 'Uncategorized',
         ]);
     }
 

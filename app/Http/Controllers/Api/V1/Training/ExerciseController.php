@@ -16,13 +16,15 @@ class ExerciseController extends Controller
     public function index(): JsonResponse
     {
         $exercises = Exercise::query()
+            ->with(['equipment:id,name,category', 'bodyStructures:id,name,type,region'])
             ->orderBy('canonical_name')
             ->get([
                 'id',
                 'canonical_name',
                 'exercise_category',
                 'movement_pattern',
-                'primary_muscle',
+                'equipment_id',
+                'laterality',
                 'shoulder_safety_notes',
             ]);
 

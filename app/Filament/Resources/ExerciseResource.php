@@ -1,3 +1,5 @@
+<?php
+
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ExerciseResource\Pages;
@@ -16,6 +18,20 @@ class ExerciseResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?int $navigationSort = 1;
 
+    // Movement pattern and exercise category vocabularies, confirmed against the
+    // real 102-exercise library (tbl_ExcerciseLibrary.csv) rather than invented.
+    protected static function movementPatternOptions(): array
+    {
+        $v = ['Cardio', 'Carry', 'Core', 'Hinge', 'Hold', 'Isolation', 'Mobility', 'Pull', 'Push', 'Squat'];
+        return array_combine($v, $v);
+    }
+
+    protected static function exerciseCategoryOptions(): array
+    {
+        $v = ['Cardio', 'Carry', 'Compound', 'Core', 'Hold', 'Isolation', 'Rehab', 'Warmup'];
+        return array_combine($v, $v);
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -26,41 +42,55 @@ class ExerciseResource extends Resource
                             ->required()
                             ->unique(ignoreRecord: true)
                             ->maxLength(255),
-                        Forms\Components\Select::make('muscle_group')
-                            ->options([
-                                'Arms_Biceps' => 'Arms (Biceps)',
-                                'Arms_Triceps' => 'Arms (Triceps)',
-                                'Back' => 'Back / Pull',
-                                'Chest' => 'Chest / Push',
-                                'Shoulders' => 'Shoulders',
-                                'Legs' => 'Legs / Lower Body',
-                                'Core' => 'Core / Abs',
-                                'Carry' => 'Carry / Grip',
-                                'Cardio' => 'Cardio / Aerobic',
-                                'Warmup' => 'Warmup / Mobility',
-                            ])
+                        Forms\Components\Select::make('movement_pattern')
+                            ->options(self::movementPatternOptions())
+                            ->searchable(),
+                        Forms\Components\Select::make('exercise_category')
+                            ->options(self::exerciseCategoryOptions())
                             ->required(),
-                        Forms\Components\TextInput::make('movement_pattern')
-                            ->placeholder('e.g. Curl, Extension, Horizontal Press, Pull, Squat/Lunge')
-                            ->maxLength(100),
-                        Forms\Components\TextInput::make('category')
-                            ->placeholder('e.g. Compound, Isolation, Carry, Core, Mobility')
-                            ->maxLength(100),
-                        Forms\Components\TextInput::make('equipment_type')
-                            ->placeholder('e.g. Dumbbells, Cable, Machine, Bodyweight')
-                            ->maxLength(100),
-                        Forms\Components\Toggle::make('is_unilateral')
-                            ->label('Unilateral Movement?'),
-                        Forms\Components\Toggle::make('is_timed')
+                        Forms\Components\Select::make('equipment_id')
+                            ->relationship('equipment', 'name')
+                            ->searchable()
+                            ->preload(),
+                        Forms\Components\Select::make('laterality')
+                            ->options([
+                                'bilateral' => 'Bilateral',
+                                'unilateral' => 'Unilateral',
+                                'alternating' => 'Alternating',
+                            ])
+                            ->default('bilateral')
+                            ->required(),
+                        Forms\Components\Toggle::make('is_time_based')
                             ->label('Time-based / Duration Exercise?'),
+                        Forms\Components\Toggle::make('is_distance_based')
+                            ->label('Distance-based Exercise?'),
                     ])->columns(2),
+
+                Forms\Components\Section::make('Musculature & Body Structures')
+                    ->description('Every muscle, tendon, ligament, or functional structure this exercise involves. The seeded library tags these as primary/secondary automatically — new exercises added here default to primary; adjust secondary emphasis via a follow-up edit if needed.')
+                    ->schema([
+                        Forms\Components\Select::make('bodyStructures')
+                            ->relationship('bodyStructures', 'name')
+                            ->multiple()
+                            ->searchable()
+                            ->preload()
+                            ->saveRelationshipsUsing(function ($record, $state) {
+                                $record->bodyStructures()->sync(
+                                    collect($state)->mapWithKeys(fn ($id) => [$id => ['role' => 'primary']])
+                                );
+                            }),
+                    ]),
 
                 Forms\Components\Section::make('Clinical & Safety Cues')
                     ->schema([
-                        Forms\Components\Textarea::make('safety_notes')
+                        Forms\Components\Textarea::make('shoulder_safety_notes')
                             ->label('Shoulder / Joint Safety Notes')
                             ->placeholder('e.g. Neutral grip well tolerated. Slight lean-back on pulldowns eliminates anterior capsule tightness.')
                             ->rows(3),
+                        Forms\Components\TextInput::make('preferred_replacements')
+                            ->label('Preferred Replacements')
+                            ->placeholder('e.g. Dumbbell Romanian Deadlift; Cable Pull-Through')
+                            ->maxLength(255),
                         Forms\Components\Textarea::make('notes')
                             ->label('General Exercise Cues & Equipment Notes')
                             ->rows(3),
@@ -89,32 +119,40 @@ class ExerciseResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->weight('bold'),
-                Tables\Columns\TextColumn::make('muscle_group')
+                Tables\Columns\TextColumn::make('exercise_category')
                     ->sortable()
                     ->badge(),
                 Tables\Columns\TextColumn::make('movement_pattern')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('equipment_type'),
-                Tables\Columns\IconColumn::make('is_unilateral')
-                    ->boolean()
-                    ->label('Unilateral'),
-                Tables\Columns\IconColumn::make('is_timed')
+                Tables\Columns\TextColumn::make('equipment.name')
+                    ->label('Equipment')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('bodyStructures.name')
+                    ->label('Body Structures')
+                    ->badge()
+                    ->limitList(3),
+                Tables\Columns\IconColumn::make('is_time_based')
                     ->boolean()
                     ->label('Timed'),
-                Tables\Columns\TextColumn::make('safety_notes')
+                Tables\Columns\IconColumn::make('is_distance_based')
+                    ->boolean()
+                    ->label('Distance'),
+                Tables\Columns\TextColumn::make('shoulder_safety_notes')
+                    ->label('Safety Notes')
                     ->limit(40)
-                    ->tooltip(fn ($record) => $record->safety_notes),
+                    ->tooltip(fn ($record) => $record->shoulder_safety_notes),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('muscle_group')
-                    ->options([
-                        'Arms_Biceps' => 'Arms_Biceps',
-                        'Arms_Triceps' => 'Arms_Triceps',
-                        'Back' => 'Back',
-                        'Chest' => 'Chest',
-                        'Legs' => 'Legs',
-                        'Carry' => 'Carry',
-                    ]),
+                Tables\Filters\SelectFilter::make('exercise_category')
+                    ->options(self::exerciseCategoryOptions()),
+                Tables\Filters\SelectFilter::make('movement_pattern')
+                    ->options(self::movementPatternOptions()),
+                Tables\Filters\SelectFilter::make('equipment_id')
+                    ->relationship('equipment', 'name')
+                    ->label('Equipment'),
+                Tables\Filters\SelectFilter::make('bodyStructures')
+                    ->relationship('bodyStructures', 'name')
+                    ->label('Body Structure'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

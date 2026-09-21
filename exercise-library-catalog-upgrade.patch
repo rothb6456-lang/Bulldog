@@ -1,0 +1,2279 @@
+diff --git a/app/Filament/Resources/ExerciseResource.php b/app/Filament/Resources/ExerciseResource.php
+index 4f2d07b..03be5ee 100644
+--- a/app/Filament/Resources/ExerciseResource.php
++++ b/app/Filament/Resources/ExerciseResource.php
+@@ -1,3 +1,5 @@
++<?php
++
+ namespace App\Filament\Resources;
+ 
+ use App\Filament\Resources\ExerciseResource\Pages;
+@@ -16,6 +18,20 @@ class ExerciseResource extends Resource
+     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+     protected static ?int $navigationSort = 1;
+ 
++    // Movement pattern and exercise category vocabularies, confirmed against the
++    // real 102-exercise library (tbl_ExcerciseLibrary.csv) rather than invented.
++    protected static function movementPatternOptions(): array
++    {
++        $v = ['Cardio', 'Carry', 'Core', 'Hinge', 'Hold', 'Isolation', 'Mobility', 'Pull', 'Push', 'Squat'];
++        return array_combine($v, $v);
++    }
++
++    protected static function exerciseCategoryOptions(): array
++    {
++        $v = ['Cardio', 'Carry', 'Compound', 'Core', 'Hold', 'Isolation', 'Rehab', 'Warmup'];
++        return array_combine($v, $v);
++    }
++
+     public static function form(Form $form): Form
+     {
+         return $form
+@@ -26,41 +42,55 @@ public static function form(Form $form): Form
+                             ->required()
+                             ->unique(ignoreRecord: true)
+                             ->maxLength(255),
+-                        Forms\Components\Select::make('muscle_group')
++                        Forms\Components\Select::make('movement_pattern')
++                            ->options(self::movementPatternOptions())
++                            ->searchable(),
++                        Forms\Components\Select::make('exercise_category')
++                            ->options(self::exerciseCategoryOptions())
++                            ->required(),
++                        Forms\Components\Select::make('equipment_id')
++                            ->relationship('equipment', 'name')
++                            ->searchable()
++                            ->preload(),
++                        Forms\Components\Select::make('laterality')
+                             ->options([
+-                                'Arms_Biceps' => 'Arms (Biceps)',
+-                                'Arms_Triceps' => 'Arms (Triceps)',
+-                                'Back' => 'Back / Pull',
+-                                'Chest' => 'Chest / Push',
+-                                'Shoulders' => 'Shoulders',
+-                                'Legs' => 'Legs / Lower Body',
+-                                'Core' => 'Core / Abs',
+-                                'Carry' => 'Carry / Grip',
+-                                'Cardio' => 'Cardio / Aerobic',
+-                                'Warmup' => 'Warmup / Mobility',
++                                'bilateral' => 'Bilateral',
++                                'unilateral' => 'Unilateral',
++                                'alternating' => 'Alternating',
+                             ])
++                            ->default('bilateral')
+                             ->required(),
+-                        Forms\Components\TextInput::make('movement_pattern')
+-                            ->placeholder('e.g. Curl, Extension, Horizontal Press, Pull, Squat/Lunge')
+-                            ->maxLength(100),
+-                        Forms\Components\TextInput::make('category')
+-                            ->placeholder('e.g. Compound, Isolation, Carry, Core, Mobility')
+-                            ->maxLength(100),
+-                        Forms\Components\TextInput::make('equipment_type')
+-                            ->placeholder('e.g. Dumbbells, Cable, Machine, Bodyweight')
+-                            ->maxLength(100),
+-                        Forms\Components\Toggle::make('is_unilateral')
+-                            ->label('Unilateral Movement?'),
+-                        Forms\Components\Toggle::make('is_timed')
++                        Forms\Components\Toggle::make('is_time_based')
+                             ->label('Time-based / Duration Exercise?'),
++                        Forms\Components\Toggle::make('is_distance_based')
++                            ->label('Distance-based Exercise?'),
+                     ])->columns(2),
+ 
++                Forms\Components\Section::make('Musculature & Body Structures')
++                    ->description('Every muscle, tendon, ligament, or functional structure this exercise involves. The seeded library tags these as primary/secondary automatically — new exercises added here default to primary; adjust secondary emphasis via a follow-up edit if needed.')
++                    ->schema([
++                        Forms\Components\Select::make('bodyStructures')
++                            ->relationship('bodyStructures', 'name')
++                            ->multiple()
++                            ->searchable()
++                            ->preload()
++                            ->saveRelationshipsUsing(function ($record, $state) {
++                                $record->bodyStructures()->sync(
++                                    collect($state)->mapWithKeys(fn ($id) => [$id => ['role' => 'primary']])
++                                );
++                            }),
++                    ]),
++
+                 Forms\Components\Section::make('Clinical & Safety Cues')
+                     ->schema([
+-                        Forms\Components\Textarea::make('safety_notes')
++                        Forms\Components\Textarea::make('shoulder_safety_notes')
+                             ->label('Shoulder / Joint Safety Notes')
+                             ->placeholder('e.g. Neutral grip well tolerated. Slight lean-back on pulldowns eliminates anterior capsule tightness.')
+                             ->rows(3),
++                        Forms\Components\TextInput::make('preferred_replacements')
++                            ->label('Preferred Replacements')
++                            ->placeholder('e.g. Dumbbell Romanian Deadlift; Cable Pull-Through')
++                            ->maxLength(255),
+                         Forms\Components\Textarea::make('notes')
+                             ->label('General Exercise Cues & Equipment Notes')
+                             ->rows(3),
+@@ -89,32 +119,40 @@ public static function table(Table $table): Table
+                     ->searchable()
+                     ->sortable()
+                     ->weight('bold'),
+-                Tables\Columns\TextColumn::make('muscle_group')
++                Tables\Columns\TextColumn::make('exercise_category')
+                     ->sortable()
+                     ->badge(),
+                 Tables\Columns\TextColumn::make('movement_pattern')
+                     ->sortable(),
+-                Tables\Columns\TextColumn::make('equipment_type'),
+-                Tables\Columns\IconColumn::make('is_unilateral')
+-                    ->boolean()
+-                    ->label('Unilateral'),
+-                Tables\Columns\IconColumn::make('is_timed')
++                Tables\Columns\TextColumn::make('equipment.name')
++                    ->label('Equipment')
++                    ->sortable(),
++                Tables\Columns\TextColumn::make('bodyStructures.name')
++                    ->label('Body Structures')
++                    ->badge()
++                    ->limitList(3),
++                Tables\Columns\IconColumn::make('is_time_based')
+                     ->boolean()
+                     ->label('Timed'),
+-                Tables\Columns\TextColumn::make('safety_notes')
++                Tables\Columns\IconColumn::make('is_distance_based')
++                    ->boolean()
++                    ->label('Distance'),
++                Tables\Columns\TextColumn::make('shoulder_safety_notes')
++                    ->label('Safety Notes')
+                     ->limit(40)
+-                    ->tooltip(fn ($record) => $record->safety_notes),
++                    ->tooltip(fn ($record) => $record->shoulder_safety_notes),
+             ])
+             ->filters([
+-                Tables\Filters\SelectFilter::make('muscle_group')
+-                    ->options([
+-                        'Arms_Biceps' => 'Arms_Biceps',
+-                        'Arms_Triceps' => 'Arms_Triceps',
+-                        'Back' => 'Back',
+-                        'Chest' => 'Chest',
+-                        'Legs' => 'Legs',
+-                        'Carry' => 'Carry',
+-                    ]),
++                Tables\Filters\SelectFilter::make('exercise_category')
++                    ->options(self::exerciseCategoryOptions()),
++                Tables\Filters\SelectFilter::make('movement_pattern')
++                    ->options(self::movementPatternOptions()),
++                Tables\Filters\SelectFilter::make('equipment_id')
++                    ->relationship('equipment', 'name')
++                    ->label('Equipment'),
++                Tables\Filters\SelectFilter::make('bodyStructures')
++                    ->relationship('bodyStructures', 'name')
++                    ->label('Body Structure'),
+             ])
+             ->actions([
+                 Tables\Actions\EditAction::make(),
+@@ -134,4 +172,4 @@ public static function getPages(): array
+             'edit' => Pages\EditExercise::route('/{record}/edit'),
+         ];
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/app/Http/Controllers/Api/V1/Training/ExerciseController.php b/app/Http/Controllers/Api/V1/Training/ExerciseController.php
+index 6b68a10..7273eec 100644
+--- a/app/Http/Controllers/Api/V1/Training/ExerciseController.php
++++ b/app/Http/Controllers/Api/V1/Training/ExerciseController.php
+@@ -16,13 +16,15 @@ class ExerciseController extends Controller
+     public function index(): JsonResponse
+     {
+         $exercises = Exercise::query()
++            ->with(['equipment:id,name,category', 'bodyStructures:id,name,type,region'])
+             ->orderBy('canonical_name')
+             ->get([
+                 'id',
+                 'canonical_name',
+                 'exercise_category',
+                 'movement_pattern',
+-                'primary_muscle',
++                'equipment_id',
++                'laterality',
+                 'shoulder_safety_notes',
+             ]);
+ 
+diff --git a/app/Http/Controllers/Api/V1/Training/TrainingSessionController.php b/app/Http/Controllers/Api/V1/Training/TrainingSessionController.php
+index 271545e..28332fe 100644
+--- a/app/Http/Controllers/Api/V1/Training/TrainingSessionController.php
++++ b/app/Http/Controllers/Api/V1/Training/TrainingSessionController.php
+@@ -144,9 +144,9 @@ private function resolveExercise(?string $exerciseId, string $rawName): Exercise
+         }
+ 
+         return Exercise::create([
+-            'id'             => (string) Str::uuid(),
+-            'canonical_name' => $rawName,
+-            'category'       => 'Other',
++            'id'                => (string) Str::uuid(),
++            'canonical_name'    => $rawName,
++            'exercise_category' => 'Uncategorized',
+         ]);
+     }
+ 
+diff --git a/app/Models/BodyStructure.php b/app/Models/BodyStructure.php
+new file mode 100644
+index 0000000..f1826d1
+--- /dev/null
++++ b/app/Models/BodyStructure.php
+@@ -0,0 +1,31 @@
++<?php
++
++namespace App\Models;
++
++use App\Traits\HasUuid;
++use Illuminate\Database\Eloquent\Factories\HasFactory;
++use Illuminate\Database\Eloquent\Model;
++use Illuminate\Database\Eloquent\Relations\BelongsToMany;
++
++class BodyStructure extends Model
++{
++    use HasFactory, HasUuid;
++
++    protected $fillable = [
++        'name',
++        'type',
++        'region',
++        'short_description',
++        'function_notes',
++        'common_issues',
++        'reference_notes',
++        'sort_order',
++    ];
++
++    public function exercises(): BelongsToMany
++    {
++        return $this->belongsToMany(Exercise::class, 'exercise_body_structures')
++            ->withPivot('role')
++            ->withTimestamps();
++    }
++}
+diff --git a/app/Models/Equipment.php b/app/Models/Equipment.php
+new file mode 100644
+index 0000000..acddfe3
+--- /dev/null
++++ b/app/Models/Equipment.php
+@@ -0,0 +1,27 @@
++<?php
++
++namespace App\Models;
++
++use App\Traits\HasUuid;
++use Illuminate\Database\Eloquent\Factories\HasFactory;
++use Illuminate\Database\Eloquent\Model;
++use Illuminate\Database\Eloquent\Relations\HasMany;
++
++class Equipment extends Model
++{
++    use HasFactory, HasUuid;
++
++    protected $fillable = [
++        'external_code',
++        'name',
++        'category',
++        'manufacturer',
++        'gym_location',
++        'notes',
++    ];
++
++    public function exercises(): HasMany
++    {
++        return $this->hasMany(Exercise::class, 'equipment_id');
++    }
++}
+diff --git a/app/Models/Exercise.php b/app/Models/Exercise.php
+index e5a8537..3f339ca 100644
+--- a/app/Models/Exercise.php
++++ b/app/Models/Exercise.php
+@@ -5,6 +5,8 @@
+ use Illuminate\Database\Eloquent\Concerns\HasUuids;
+ use Illuminate\Database\Eloquent\Factories\HasFactory;
+ use Illuminate\Database\Eloquent\Model;
++use Illuminate\Database\Eloquent\Relations\BelongsTo;
++use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+ use Illuminate\Database\Eloquent\Relations\HasMany;
+ 
+ class Exercise extends Model
+@@ -14,15 +16,7 @@ class Exercise extends Model
+     protected $fillable = [
+         'canonical_name',
+         'movement_pattern',
+-        'muscle_group',
+-        'category',
+-        'equipment_type',
+-        'is_unilateral',
+-        'is_timed',
+-        'safety_notes',
+-        'primary_muscle',
+-        'secondary_muscles',
+-        'default_equipment_id',
++        'equipment_id',
+         'laterality',
+         'exercise_category',
+         'is_time_based',
+@@ -33,12 +27,32 @@ class Exercise extends Model
+     ];
+ 
+     protected $casts = [
+-        'is_unilateral' => 'boolean',
+-        'is_timed' => 'boolean',
+         'is_time_based' => 'boolean',
+         'is_distance_based' => 'boolean',
+     ];
+ 
++    public function equipment(): BelongsTo
++    {
++        return $this->belongsTo(Equipment::class, 'equipment_id');
++    }
++
++    public function bodyStructures(): BelongsToMany
++    {
++        return $this->belongsToMany(BodyStructure::class, 'exercise_body_structures')
++            ->withPivot('role')
++            ->withTimestamps();
++    }
++
++    public function primaryBodyStructures(): BelongsToMany
++    {
++        return $this->bodyStructures()->wherePivot('role', 'primary');
++    }
++
++    public function secondaryBodyStructures(): BelongsToMany
++    {
++        return $this->bodyStructures()->wherePivot('role', 'secondary');
++    }
++
+     public function nameMaps(): HasMany
+     {
+         return $this->hasMany(ExerciseNameMap::class, 'exercise_id');
+diff --git a/database/migrations/2026_09_20_180001_create_equipment_table.php b/database/migrations/2026_09_20_180001_create_equipment_table.php
+new file mode 100644
+index 0000000..e298d53
+--- /dev/null
++++ b/database/migrations/2026_09_20_180001_create_equipment_table.php
+@@ -0,0 +1,28 @@
++<?php
++
++use Illuminate\Database\Migrations\Migration;
++use Illuminate\Database\Schema\Blueprint;
++use Illuminate\Support\Facades\Schema;
++
++return new class extends Migration
++{
++    public function up(): void
++    {
++        Schema::create('equipment', function (Blueprint $table) {
++            $table->uuid('id')->primary();
++            // Traceable back to the source tbl_Equipment.csv (EQ-DB, EQ-BB, etc.)
++            $table->string('external_code')->unique();
++            $table->string('name');
++            $table->string('category')->nullable()->index(); // Free Weight, Cable, Selectorized Machine, Band, Cardio, Bodyweight, Accessory
++            $table->string('manufacturer')->nullable();
++            $table->string('gym_location')->nullable();
++            $table->text('notes')->nullable();
++            $table->timestamps();
++        });
++    }
++
++    public function down(): void
++    {
++        Schema::dropIfExists('equipment');
++    }
++};
+diff --git a/database/migrations/2026_09_20_180002_create_body_structures_table.php b/database/migrations/2026_09_20_180002_create_body_structures_table.php
+new file mode 100644
+index 0000000..15cd187
+--- /dev/null
++++ b/database/migrations/2026_09_20_180002_create_body_structures_table.php
+@@ -0,0 +1,32 @@
++<?php
++
++use Illuminate\Database\Migrations\Migration;
++use Illuminate\Database\Schema\Blueprint;
++use Illuminate\Support\Facades\Schema;
++
++return new class extends Migration
++{
++    public function up(): void
++    {
++        Schema::create('body_structures', function (Blueprint $table) {
++            $table->uuid('id')->primary();
++            $table->string('name')->unique();
++            // muscle | muscle_group (e.g. Rotator Cuff = 4 muscles) | region (broad grouping, e.g. Shoulders) | functional_role (e.g. Stabilizers)
++            $table->string('type')->index();
++            // Broad region this structure is filed under, for grouping in the UI (Chest, Back, Shoulders, Arms, Core, Hips & Legs, Full Body)
++            $table->string('region')->index();
++            $table->string('short_description'); // one line: what/where
++            $table->text('function_notes')->nullable(); // what it does, why it matters in training
++            $table->text('common_issues')->nullable(); // training-relevant injuries/considerations (general knowledge, not medical advice)
++            // Intentionally left for deliberate, sourced additions later — never populated with invented citations.
++            $table->text('reference_notes')->nullable();
++            $table->integer('sort_order')->default(0);
++            $table->timestamps();
++        });
++    }
++
++    public function down(): void
++    {
++        Schema::dropIfExists('body_structures');
++    }
++};
+diff --git a/database/migrations/2026_09_20_180003_create_exercise_body_structures_table.php b/database/migrations/2026_09_20_180003_create_exercise_body_structures_table.php
+new file mode 100644
+index 0000000..39a242e
+--- /dev/null
++++ b/database/migrations/2026_09_20_180003_create_exercise_body_structures_table.php
+@@ -0,0 +1,28 @@
++<?php
++
++use Illuminate\Database\Migrations\Migration;
++use Illuminate\Database\Schema\Blueprint;
++use Illuminate\Support\Facades\Schema;
++
++return new class extends Migration
++{
++    public function up(): void
++    {
++        Schema::create('exercise_body_structures', function (Blueprint $table) {
++            $table->uuid('id')->primary();
++            $table->uuid('exercise_id');
++            $table->uuid('body_structure_id');
++            $table->string('role')->default('primary'); // primary | secondary
++            $table->timestamps();
++
++            $table->foreign('exercise_id')->references('id')->on('exercises')->cascadeOnDelete();
++            $table->foreign('body_structure_id')->references('id')->on('body_structures')->cascadeOnDelete();
++            $table->unique(['exercise_id', 'body_structure_id']);
++        });
++    }
++
++    public function down(): void
++    {
++        Schema::dropIfExists('exercise_body_structures');
++    }
++};
+diff --git a/database/migrations/2026_09_20_180004_consolidate_exercises_metadata_columns.php b/database/migrations/2026_09_20_180004_consolidate_exercises_metadata_columns.php
+new file mode 100644
+index 0000000..2afe291
+--- /dev/null
++++ b/database/migrations/2026_09_20_180004_consolidate_exercises_metadata_columns.php
+@@ -0,0 +1,59 @@
++<?php
++
++use Illuminate\Database\Migrations\Migration;
++use Illuminate\Database\Schema\Blueprint;
++use Illuminate\Support\Facades\Schema;
++
++return new class extends Migration
++{
++    /**
++     * Two migrations (000001 and 000010) independently added overlapping
++     * metadata to `exercises` — an older set the live Filament form actually
++     * edits (muscle_group, category, equipment_type, is_unilateral, is_timed,
++     * safety_notes) and a newer, richer set nothing ever wrote to
++     * (primary_muscle, secondary_muscles, default_equipment_id, laterality,
++     * exercise_category, is_time_based, is_distance_based, shoulder_safety_notes).
++     * This consolidates onto one source of truth: the newer set survives
++     * (Filament is updated separately to match), and primary_muscle /
++     * secondary_muscles / default_equipment_id are further replaced here by a
++     * real equipment_id FK and the exercise_body_structures pivot.
++     */
++    public function up(): void
++    {
++        Schema::table('exercises', function (Blueprint $table) {
++            $table->uuid('equipment_id')->nullable()->after('movement_pattern');
++            $table->foreign('equipment_id')->references('id')->on('equipment')->nullOnDelete();
++        });
++
++        Schema::table('exercises', function (Blueprint $table) {
++            $table->dropColumn([
++                'muscle_group',
++                'category',
++                'equipment_type',
++                'is_unilateral',
++                'is_timed',
++                'safety_notes',
++                'primary_muscle',
++                'secondary_muscles',
++                'default_equipment_id',
++            ]);
++        });
++    }
++
++    public function down(): void
++    {
++        Schema::table('exercises', function (Blueprint $table) {
++            $table->dropForeign(['equipment_id']);
++            $table->dropColumn('equipment_id');
++            $table->string('muscle_group')->nullable();
++            $table->string('category')->nullable();
++            $table->string('equipment_type')->nullable();
++            $table->boolean('is_unilateral')->default(false);
++            $table->boolean('is_timed')->default(false);
++            $table->text('safety_notes')->nullable();
++            $table->string('primary_muscle')->nullable();
++            $table->string('secondary_muscles')->nullable();
++            $table->string('default_equipment_id')->nullable();
++        });
++    }
++};
+diff --git a/database/seeders/BodyStructureSeeder.php b/database/seeders/BodyStructureSeeder.php
+new file mode 100644
+index 0000000..688d7d1
+--- /dev/null
++++ b/database/seeders/BodyStructureSeeder.php
+@@ -0,0 +1,166 @@
++<?php
++
++namespace Database\Seeders;
++
++use App\Models\BodyStructure;
++use Illuminate\Database\Seeder;
++
++class BodyStructureSeeder extends Seeder
++{
++    /**
++     * Educational content here is written from well-established general
++     * anatomy/exercise-science knowledge. reference_notes is intentionally
++     * left blank throughout — specific peer-reviewed citations should be
++     * added deliberately later, never fabricated to fill the field.
++     */
++    public function run(): void
++    {
++        $rows = [
++            // Chest
++            ['name' => 'Chest', 'type' => 'muscle', 'region' => 'Chest', 'sort_order' => 1,
++                'short_description' => 'The pectoralis major and minor — the primary pushing muscles across the front of the chest.',
++                'function_notes' => 'Drives horizontal and incline pressing movements; adducts and internally rotates the shoulder.',
++                'common_issues' => 'Tightness here is a common contributor to rounded-shoulder posture; strains typically occur during heavy pressing under fatigue.'],
++            ['name' => 'Upper Chest', 'type' => 'muscle', 'region' => 'Chest', 'sort_order' => 2,
++                'short_description' => 'The clavicular (upper) head of the pectoralis major, emphasized by incline pressing angles.',
++                'function_notes' => 'Contributes to shoulder flexion and horizontal adduction, more active as the pressing angle inclines.',
++                'common_issues' => 'Often lags in development without dedicated incline work; rarely a standalone injury site.'],
++
++            // Back
++            ['name' => 'Back', 'type' => 'muscle_group', 'region' => 'Back', 'sort_order' => 3,
++                'short_description' => 'General term for the posterior trunk musculature — primarily the lats, traps, and rhomboids.',
++                'function_notes' => 'Drives pulling movements and spinal/scapular stabilization.',
++                'common_issues' => 'Non-specific back tightness is common and usually resolves with balanced pulling volume and mobility work.'],
++            ['name' => 'Lats', 'type' => 'muscle', 'region' => 'Back', 'sort_order' => 4,
++                'short_description' => 'Latissimus dorsi — the broad, wing-shaped muscle spanning the mid-to-lower back to the upper arm.',
++                'function_notes' => 'Primary driver of pulling movements (rows, pull-ups); extends and adducts the shoulder.',
++                'common_issues' => 'Tightness can restrict overhead shoulder flexion; strains are uncommon but occur with explosive pulling.'],
++            ['name' => 'Rhomboids', 'type' => 'muscle', 'region' => 'Back', 'sort_order' => 5,
++                'short_description' => 'Small muscles between the shoulder blades and spine.',
++                'function_notes' => 'Retract the scapulae, supporting posture and pulling mechanics.',
++                'common_issues' => 'Frequently underdeveloped relative to pressing muscles, contributing to rounded-shoulder posture.'],
++            ['name' => 'Traps', 'type' => 'muscle', 'region' => 'Back', 'sort_order' => 6,
++                'short_description' => 'Trapezius — a large muscle spanning the neck, shoulders, and mid-back.',
++                'function_notes' => 'Elevates, retracts, and rotates the scapula; stabilizes the shoulder girdle during pulling and carrying.',
++                'common_issues' => 'Upper traps often become overactive/tight with desk posture; lower traps are commonly underdeveloped.'],
++            ['name' => 'Lower Back', 'type' => 'muscle_group', 'region' => 'Back', 'sort_order' => 7,
++                'short_description' => 'The erector spinae and surrounding musculature along the lumbar spine.',
++                'function_notes' => 'Extends and stabilizes the spine during hinging, squatting, and carrying.',
++                'common_issues' => 'One of the most common sites of training-related strain, usually from loaded flexion under fatigue.'],
++            ['name' => 'Spine', 'type' => 'region', 'region' => 'Back', 'sort_order' => 8,
++                'short_description' => 'The vertebral column and its surrounding stabilizing structures.',
++                'function_notes' => 'Provides the structural axis for nearly every lift; spinal stability underlies safe force transfer.',
++                'common_issues' => "Training focus here is typically about positioning and bracing rather than isolating the spine itself."],
++
++            // Shoulders
++            ['name' => 'Shoulders', 'type' => 'muscle_group', 'region' => 'Shoulders', 'sort_order' => 9,
++                'short_description' => 'General term for the deltoid complex and surrounding shoulder musculature.',
++                'function_notes' => 'Drives overhead and lateral arm movement; a key stabilizer for pressing and pulling.',
++                'common_issues' => 'The shoulder is the most mobile and least inherently stable joint in the body, making it a common site for overuse issues.'],
++            ['name' => 'Lateral Delts', 'type' => 'muscle', 'region' => 'Shoulders', 'sort_order' => 10,
++                'short_description' => 'The side head of the deltoid.',
++                'function_notes' => 'Primary driver of arm abduction (raising the arm out to the side).',
++                'common_issues' => 'Rarely injured directly; often a focal point for shoulder-width development.'],
++            ['name' => 'Rear Delts', 'type' => 'muscle', 'region' => 'Shoulders', 'sort_order' => 11,
++                'short_description' => 'The posterior head of the deltoid.',
++                'function_notes' => 'Assists shoulder extension and horizontal abduction; supports posture by countering forward shoulder pull.',
++                'common_issues' => 'Commonly underdeveloped relative to the front delts, contributing to shoulder imbalance.'],
++            ['name' => 'Anterior Delts', 'type' => 'muscle', 'region' => 'Shoulders', 'sort_order' => 12,
++                'short_description' => 'The front head of the deltoid.',
++                'function_notes' => 'Assists shoulder flexion and horizontal pressing.',
++                'common_issues' => 'Often overworked from high pressing volume relative to pulling — a common source of anterior shoulder fatigue.'],
++            ['name' => 'Rotator Cuff', 'type' => 'muscle_group', 'region' => 'Shoulders', 'sort_order' => 13,
++                'short_description' => 'A group of four muscles (supraspinatus, infraspinatus, teres minor, subscapularis) wrapping around the shoulder joint.',
++                'function_notes' => 'Stabilizes the head of the humerus in the shoulder socket and controls rotation of the upper arm.',
++                'common_issues' => 'One of the most common sites of shoulder injury (tendinitis, impingement, tears), especially with repetitive overhead loading or sudden heavy rotational stress — a frequent focus of shoulder rehab programming.'],
++            ['name' => 'External Rotators', 'type' => 'muscle_group', 'region' => 'Shoulders', 'sort_order' => 14,
++                'short_description' => 'The infraspinatus and teres minor — the rotator cuff muscles responsible for external (outward) rotation of the arm.',
++                'function_notes' => 'Balances the often-dominant internal rotators; key for shoulder joint health and overhead stability.',
++                'common_issues' => 'Frequently underdeveloped relative to internal rotators (chest/lats) — a common target in shoulder-health and rehab programming.'],
++            ['name' => 'Serratus Anterior', 'type' => 'muscle', 'region' => 'Shoulders', 'sort_order' => 15,
++                'short_description' => 'A muscle along the side of the ribcage, under the shoulder blade.',
++                'function_notes' => 'Rotates and stabilizes the scapula against the ribcage, especially during overhead pressing.',
++                'common_issues' => "Weakness here (scapular \"winging\") can contribute to shoulder instability."],
++
++            // Arms
++            ['name' => 'Biceps', 'type' => 'muscle', 'region' => 'Arms', 'sort_order' => 16,
++                'short_description' => 'Biceps brachii — the two-headed muscle on the front of the upper arm.',
++                'function_notes' => 'Flexes the elbow and supinates the forearm.',
++                'common_issues' => 'Strains can occur with heavy curling or sudden eccentric load (e.g. catching a heavy weight).'],
++            ['name' => 'Triceps', 'type' => 'muscle', 'region' => 'Arms', 'sort_order' => 17,
++                'short_description' => 'Triceps brachii — the three-headed muscle on the back of the upper arm.',
++                'function_notes' => 'Extends the elbow; the primary driver of pressing lockout.',
++                'common_issues' => 'Tendinopathy at the elbow attachment can develop with high-volume pressing.'],
++            ['name' => 'Brachialis', 'type' => 'muscle', 'region' => 'Arms', 'sort_order' => 18,
++                'short_description' => 'A muscle beneath the biceps, deep in the upper arm.',
++                'function_notes' => 'A strong elbow flexor, especially active in neutral- and hammer-grip curling.',
++                'common_issues' => 'Rarely injured in isolation; often trained to add overall arm thickness.'],
++            ['name' => 'Forearms', 'type' => 'muscle_group', 'region' => 'Arms', 'sort_order' => 19,
++                'short_description' => 'The muscles of the lower arm controlling wrist and finger movement.',
++                'function_notes' => 'Grip strength, wrist flexion/extension, and stabilization during carries and pulling.',
++                'common_issues' => "Overuse (e.g. from heavy carries or high pulling volume) can contribute to elbow tendinopathy (\"tennis\"/\"golfer's\" elbow)."],
++            ['name' => 'Fingers', 'type' => 'functional_role', 'region' => 'Arms', 'sort_order' => 20,
++                'short_description' => 'The flexor and extensor muscles/tendons controlling grip.',
++                'function_notes' => 'Directly responsible for grip strength in carries, pulls, and hangs.',
++                'common_issues' => 'Finger flexor tendons can be strained with sudden heavy grip demands.'],
++            ['name' => 'Arms', 'type' => 'region', 'region' => 'Arms', 'sort_order' => 21,
++                'short_description' => 'General term covering the upper-arm and forearm musculature.',
++                'function_notes' => 'Supports elbow flexion/extension and grip across most upper-body movements.',
++                'common_issues' => 'See individual arm structures (Biceps, Triceps, Forearms) for specific considerations.'],
++
++            // Core
++            ['name' => 'Core', 'type' => 'muscle_group', 'region' => 'Core', 'sort_order' => 22,
++                'short_description' => 'The abdominal and deep trunk musculature, including the rectus abdominis and transverse abdominis.',
++                'function_notes' => 'Stabilizes the spine and transfers force between the upper and lower body during nearly all lifts.',
++                'common_issues' => 'Core fatigue is a common contributor to breakdown in lifting form under heavy load.'],
++            ['name' => 'Obliques', 'type' => 'muscle', 'region' => 'Core', 'sort_order' => 23,
++                'short_description' => 'The internal and external oblique muscles along the sides of the abdomen.',
++                'function_notes' => 'Rotate and laterally flex the trunk; key stabilizers against anti-rotation and side-bending forces.',
++                'common_issues' => 'Commonly strained by explosive rotational movement without adequate warm-up.'],
++
++            // Hips & Legs
++            ['name' => 'Glutes', 'type' => 'muscle_group', 'region' => 'Hips & Legs', 'sort_order' => 24,
++                'short_description' => 'The gluteus maximus, medius, and minimus — the primary hip muscles.',
++                'function_notes' => 'Drives hip extension (squatting, hinging) and stabilizes the pelvis during single-leg work.',
++                'common_issues' => 'Underactivity here is commonly linked to compensatory low-back or hamstring strain.'],
++            ['name' => 'Hamstrings', 'type' => 'muscle', 'region' => 'Hips & Legs', 'sort_order' => 25,
++                'short_description' => 'The muscle group on the back of the thigh.',
++                'function_notes' => 'Extends the hip and flexes the knee; central to hinging movements like deadlifts.',
++                'common_issues' => 'One of the most commonly strained muscles in training, especially with explosive movement or inadequate warm-up.'],
++            ['name' => 'Quads', 'type' => 'muscle', 'region' => 'Hips & Legs', 'sort_order' => 26,
++                'short_description' => 'Quadriceps femoris — the muscle group on the front of the thigh.',
++                'function_notes' => 'Extends the knee; a primary driver of squatting and pressing movements with the legs.',
++                'common_issues' => 'Generally resilient; overuse soreness is common after high-volume squat/lunge work.'],
++            ['name' => 'Hip Flexors', 'type' => 'muscle_group', 'region' => 'Hips & Legs', 'sort_order' => 27,
++                'short_description' => 'Muscles including the iliopsoas that lift the knee toward the torso.',
++                'function_notes' => 'Flexes the hip; active in carries, running mechanics, and stabilizing the lower body.',
++                'common_issues' => 'Commonly tight from prolonged sitting; can be a source of anterior hip discomfort if overworked without balancing glute/hamstring work.'],
++            ['name' => 'Calves', 'type' => 'muscle', 'region' => 'Hips & Legs', 'sort_order' => 28,
++                'short_description' => 'The gastrocnemius and soleus on the back of the lower leg.',
++                'function_notes' => 'Plantarflexes the ankle; supports propulsion in walking, running, and jumping.',
++                'common_issues' => 'Prone to tightness and cramping; strains can occur with sudden explosive movement.'],
++            ['name' => 'Tibialis Anterior', 'type' => 'muscle', 'region' => 'Hips & Legs', 'sort_order' => 29,
++                'short_description' => 'The muscle along the front of the shin.',
++                'function_notes' => 'Dorsiflexes the ankle (lifts the foot); often undertrained relative to the calves.',
++                'common_issues' => "Can become a source of shin discomfort (\"shin splints\") with sudden increases in running or jumping volume."],
++            ['name' => 'Legs', 'type' => 'region', 'region' => 'Hips & Legs', 'sort_order' => 30,
++                'short_description' => 'General term covering the hip, thigh, and lower-leg musculature.',
++                'function_notes' => 'Drives squatting, hinging, and locomotion-based movement patterns.',
++                'common_issues' => 'See individual leg structures (Quads, Hamstrings, Glutes, Calves) for specific considerations.'],
++
++            // Full Body
++            ['name' => 'Full Body', 'type' => 'region', 'region' => 'Full Body', 'sort_order' => 31,
++                'short_description' => 'Movements that meaningfully load multiple major muscle groups at once rather than isolating one area.',
++                'function_notes' => 'Builds general work capacity, coordination, and conditioning across the whole system.',
++                'common_issues' => 'Fatigue management matters more here than in isolation work, since many systems are taxed simultaneously.'],
++            ['name' => 'Stabilizers', 'type' => 'functional_role', 'region' => 'Full Body', 'sort_order' => 32,
++                'short_description' => 'The secondary muscles that hold a joint steady rather than driving the main movement.',
++                'function_notes' => 'Maintain joint position and control under load, especially in unilateral or free-weight movements.',
++                'common_issues' => 'Stabilizer fatigue often shows up as form breakdown before the prime mover itself is fully fatigued.'],
++        ];
++
++        foreach ($rows as $row) {
++            BodyStructure::updateOrCreate(['name' => $row['name']], $row);
++        }
++    }
++}
+diff --git a/database/seeders/DatabaseSeeder.php b/database/seeders/DatabaseSeeder.php
+index faee50d..96f51b5 100644
+--- a/database/seeders/DatabaseSeeder.php
++++ b/database/seeders/DatabaseSeeder.php
+@@ -16,6 +16,10 @@ public function run(): void
+             RulesetSeeder::class,
+             SystemBadgeSeeder::class,
+             TrainingGoalTemplateSeeder::class,
++            EquipmentSeeder::class,
++            BodyStructureSeeder::class,
++            ExerciseSeeder::class,
++            ExerciseNameMapSeeder::class,
+         ]);
+     }
+ }
+diff --git a/database/seeders/EquipmentSeeder.php b/database/seeders/EquipmentSeeder.php
+new file mode 100644
+index 0000000..44609ef
+--- /dev/null
++++ b/database/seeders/EquipmentSeeder.php
+@@ -0,0 +1,44 @@
++<?php
++
++namespace Database\Seeders;
++
++use App\Models\Equipment;
++use Illuminate\Database\Seeder;
++
++class EquipmentSeeder extends Seeder
++{
++    public function run(): void
++    {
++        $rows = [
++            ['external_code' => 'EQ-DB', 'name' => 'Dumbbells', 'category' => 'Free Weight', 'manufacturer' => 'Various', 'gym_location' => 'Multiple'],
++            ['external_code' => 'EQ-BB', 'name' => 'Barbell', 'category' => 'Free Weight', 'manufacturer' => 'Various', 'gym_location' => 'Multiple'],
++            ['external_code' => 'EQ-KB', 'name' => 'Kettlebell', 'category' => 'Free Weight', 'manufacturer' => 'Various', 'gym_location' => 'Multiple'],
++            ['external_code' => 'EQ-PLT', 'name' => 'Weight Plate', 'category' => 'Free Weight', 'manufacturer' => 'Various', 'gym_location' => 'Multiple'],
++            ['external_code' => 'EQ-SM', 'name' => 'Smith Machine', 'category' => 'Plate-Loaded Machine', 'manufacturer' => 'Various', 'gym_location' => 'Multiple'],
++            ['external_code' => 'EQ-CAB', 'name' => 'Adjustable Cable Pulley', 'category' => 'Cable', 'manufacturer' => 'Various', 'gym_location' => 'Multiple'],
++            ['external_code' => 'EQ-LF-MR', 'name' => 'LifeFitness Machine Row', 'category' => 'Selectorized Machine', 'manufacturer' => 'LifeFitness', 'gym_location' => 'Planet Fitness'],
++            ['external_code' => 'EQ-LF-CP', 'name' => 'LifeFitness Chest Press', 'category' => 'Selectorized Machine', 'manufacturer' => 'LifeFitness', 'gym_location' => 'Planet Fitness'],
++            ['external_code' => 'EQ-LF-LR', 'name' => 'LifeFitness Low Row', 'category' => 'Selectorized Machine', 'manufacturer' => 'LifeFitness', 'gym_location' => 'Planet Fitness'],
++            ['external_code' => 'EQ-PRE-FTS', 'name' => 'Precor FTS Glide', 'category' => 'Cable', 'manufacturer' => 'Precor', 'gym_location' => 'LI Marriott'],
++            ['external_code' => 'EQ-PRE-CP', 'name' => 'Precor Chest Press', 'category' => 'Selectorized Machine', 'manufacturer' => 'Precor', 'gym_location' => 'Hotel Gyms'],
++            ['external_code' => 'EQ-C2', 'name' => 'Concept2 Rower', 'category' => 'Cardio', 'manufacturer' => 'Concept2', 'gym_location' => 'Multiple'],
++            ['external_code' => 'EQ-TM', 'name' => 'Treadmill', 'category' => 'Cardio', 'manufacturer' => 'Various', 'gym_location' => 'Multiple'],
++            ['external_code' => 'EQ-BIKE', 'name' => 'Stationary Bike', 'category' => 'Cardio', 'manufacturer' => 'Various', 'gym_location' => 'Multiple'],
++            ['external_code' => 'EQ-ER', 'name' => 'Endless Rope Machine', 'category' => 'Cardio', 'manufacturer' => 'Various', 'gym_location' => 'Planet Fitness'],
++            ['external_code' => 'EQ-PLM', 'name' => 'Plate-Loaded Machine', 'category' => 'Plate-Loaded Machine', 'manufacturer' => 'Various', 'gym_location' => 'Multiple'],
++            ['external_code' => 'EQ-MCH', 'name' => 'Selectorized Machine (Generic)', 'category' => 'Selectorized Machine', 'manufacturer' => 'Various', 'gym_location' => 'Multiple'],
++            ['external_code' => 'EQ-BW', 'name' => 'Bodyweight', 'category' => 'Bodyweight', 'manufacturer' => 'N/A', 'gym_location' => 'N/A'],
++            ['external_code' => 'EQ-BAND', 'name' => 'Resistance Band', 'category' => 'Band', 'manufacturer' => 'Various', 'gym_location' => 'Personal'],
++            ['external_code' => 'EQ-BAND-R', 'name' => 'Resistance Band - Red', 'category' => 'Band', 'manufacturer' => 'Various', 'gym_location' => 'Personal', 'notes' => 'Light resistance'],
++            ['external_code' => 'EQ-BAND-B', 'name' => 'Resistance Band - Blue', 'category' => 'Band', 'manufacturer' => 'Various', 'gym_location' => 'Personal', 'notes' => 'Medium resistance'],
++            ['external_code' => 'EQ-BAND-G', 'name' => 'Resistance Band - Green', 'category' => 'Band', 'manufacturer' => 'Various', 'gym_location' => 'Personal', 'notes' => 'Heavy resistance'],
++            ['external_code' => 'EQ-BENCH', 'name' => 'Adjustable Bench', 'category' => 'Accessory', 'manufacturer' => 'Various', 'gym_location' => 'Multiple'],
++            ['external_code' => 'EQ-HOIST', 'name' => 'Hoist Cable Machine', 'category' => 'Cable', 'manufacturer' => 'Hoist', 'gym_location' => 'Hotel Gyms'],
++            ['external_code' => 'EQ-NXGEN', 'name' => 'NXGen Equipment', 'category' => 'Various', 'manufacturer' => 'NXGen', 'gym_location' => 'NXGen Gym'],
++        ];
++
++        foreach ($rows as $row) {
++            Equipment::updateOrCreate(['external_code' => $row['external_code']], $row);
++        }
++    }
++}
+diff --git a/database/seeders/ExerciseNameMapSeeder.php b/database/seeders/ExerciseNameMapSeeder.php
+new file mode 100644
+index 0000000..1996235
+--- /dev/null
++++ b/database/seeders/ExerciseNameMapSeeder.php
+@@ -0,0 +1,35 @@
++<?php
++
++namespace Database\Seeders;
++
++use App\Models\Exercise;
++use App\Models\ExerciseNameMap;
++use Illuminate\Database\Seeder;
++
++class ExerciseNameMapSeeder extends Seeder
++{
++    public function run(): void
++    {
++        $rows = [
++            ['1 Arm Cable Curl', 'Standing Single Arm Cable Curl'],
++            ['DB Romanian Deadlift (RDL)', 'Dumbbell Romanian Deadlift'],
++            ['Incline Dumbell Curl (Supinated)', 'Incline Dumbbell Curl (Supinated)'],
++            ['Dumbbell Incline Curl', 'Incline Dumbbell Curl (Supinated)'],
++            ['Half-Kneeling Single-Arm Cable Pulldow', 'Half-Kneeling Single-Arm Cable Pulldown'],
++            ['Cable: Kneeling 1Arm Overhead Extension', 'Kneeling Single Arm Rope Cable Extension'],
++            ['Dumbbell: Squeeze Curl - Hammer', 'Dumbbell: Squeeze Curl - Neutral'],
++            ['Standing Single Arm Extension (D-Grip)', 'Single Arm Cable Extensions'],
++        ];
++
++        foreach ($rows as [$original, $standard]) {
++            $exercise = Exercise::where('canonical_name', $standard)->first();
++            if (! $exercise) {
++                continue; // standard name not in the seeded library yet — skip rather than guess
++            }
++            ExerciseNameMap::updateOrCreate(
++                ['original_name' => $original],
++                ['exercise_id' => $exercise->id, 'canonical_name' => $standard]
++            );
++        }
++    }
++}
+diff --git a/database/seeders/ExerciseSeeder.php b/database/seeders/ExerciseSeeder.php
+new file mode 100644
+index 0000000..35d87e0
+--- /dev/null
++++ b/database/seeders/ExerciseSeeder.php
+@@ -0,0 +1,1475 @@
++<?php
++
++namespace Database\Seeders;
++
++use App\Models\BodyStructure;
++use App\Models\Equipment;
++use App\Models\Exercise;
++use Illuminate\Database\Seeder;
++
++class ExerciseSeeder extends Seeder
++{
++    public function run(): void
++    {
++        $rows = [
++            [
++                'canonical_name' => 'Farmer\'s Walk',
++                'movement_pattern' => 'Carry',
++                'equipment_code' => 'EQ-DB',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Carry',
++                'is_time_based' => true,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Primary grip and carry exercise throughout all phases',
++                'primary_muscle' => 'Forearms',
++                'secondary_muscles' => ['Traps', 'Core', 'Shoulders'],
++            ],
++            [
++                'canonical_name' => 'Farmer\'s Hold',
++                'movement_pattern' => 'Hold',
++                'equipment_code' => 'EQ-DB',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Hold',
++                'is_time_based' => true,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Farmer\'s Walk',
++                'shoulder_safety_notes' => null,
++                'notes' => 'Static hold version of farmer\'s walk',
++                'primary_muscle' => 'Forearms',
++                'secondary_muscles' => ['Traps', 'Core'],
++            ],
++            [
++                'canonical_name' => 'Suitcase Carries',
++                'movement_pattern' => 'Carry',
++                'equipment_code' => 'EQ-DB',
++                'laterality' => 'unilateral',
++                'exercise_category' => 'Carry',
++                'is_time_based' => true,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Single-side carry emphasizing anti-lateral flexion',
++                'primary_muscle' => 'Forearms',
++                'secondary_muscles' => ['Obliques', 'Core', 'Traps'],
++            ],
++            [
++                'canonical_name' => 'Suitcase Holds',
++                'movement_pattern' => 'Hold',
++                'equipment_code' => 'EQ-DB',
++                'laterality' => 'unilateral',
++                'exercise_category' => 'Hold',
++                'is_time_based' => true,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Suitcase Carries',
++                'shoulder_safety_notes' => null,
++                'notes' => 'Static hold version of suitcase carry',
++                'primary_muscle' => 'Forearms',
++                'secondary_muscles' => ['Obliques', 'Core'],
++            ],
++            [
++                'canonical_name' => 'Body Row',
++                'movement_pattern' => 'Pull',
++                'equipment_code' => 'EQ-BB',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Compound',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Inverted row using barbell in rack',
++                'primary_muscle' => 'Back',
++                'secondary_muscles' => ['Biceps', 'Forearms', 'Core'],
++            ],
++            [
++                'canonical_name' => 'Machine Row',
++                'movement_pattern' => 'Pull',
++                'equipment_code' => 'EQ-LF-MR',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Compound',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Neutral Grip Seated 2 Arm Row',
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Chest-supported selectorized row',
++                'primary_muscle' => 'Back',
++                'secondary_muscles' => ['Biceps', 'Forearms'],
++            ],
++            [
++                'canonical_name' => 'Neutral Grip Seated 2 Arm Row',
++                'movement_pattern' => 'Pull',
++                'equipment_code' => 'EQ-CAB',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Compound',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Machine Row',
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Seated cable row with neutral grip attachment',
++                'primary_muscle' => 'Back',
++                'secondary_muscles' => ['Biceps', 'Forearms'],
++            ],
++            [
++                'canonical_name' => 'Chest Supported DB Row (Spider)',
++                'movement_pattern' => 'Pull',
++                'equipment_code' => 'EQ-DB',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Compound',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Incline bench chest-supported dumbbell row',
++                'primary_muscle' => 'Back',
++                'secondary_muscles' => ['Biceps', 'Rear Delts', 'Forearms'],
++            ],
++            [
++                'canonical_name' => 'Single-Arm Neutral Grip Cable Pulldown',
++                'movement_pattern' => 'Pull',
++                'equipment_code' => 'EQ-CAB',
++                'laterality' => 'unilateral',
++                'exercise_category' => 'Compound',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Slight lean back eliminates anterior capsule awareness',
++                'notes' => 'Primary lat exercise from Phase 3 onward',
++                'primary_muscle' => 'Lats',
++                'secondary_muscles' => ['Biceps', 'Forearms', 'Rear Delts'],
++            ],
++            [
++                'canonical_name' => 'Kneeling Cable Row',
++                'movement_pattern' => 'Pull',
++                'equipment_code' => 'EQ-CAB',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Compound',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Neutral Grip Seated 2 Arm Row',
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Kneeling position at seated cable row',
++                'primary_muscle' => 'Back',
++                'secondary_muscles' => ['Biceps', 'Core', 'Forearms'],
++            ],
++            [
++                'canonical_name' => 'Half-Kneeling Single Arm Cable Row',
++                'movement_pattern' => 'Pull',
++                'equipment_code' => 'EQ-CAB',
++                'laterality' => 'unilateral',
++                'exercise_category' => 'Compound',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Half-kneeling unilateral cable row',
++                'primary_muscle' => 'Back',
++                'secondary_muscles' => ['Core', 'Biceps', 'Forearms'],
++            ],
++            [
++                'canonical_name' => 'Half-Kneeling Single-Arm Cable Row, Low-to-High Finish',
++                'movement_pattern' => 'Pull',
++                'equipment_code' => 'EQ-CAB',
++                'laterality' => 'unilateral',
++                'exercise_category' => 'Compound',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Half-Kneeling Single Arm Cable Row',
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Low-to-high finish variant',
++                'primary_muscle' => 'Back',
++                'secondary_muscles' => ['Rear Delts', 'Core', 'Biceps'],
++            ],
++            [
++                'canonical_name' => 'Single-Arm Cable Row (Split Stance)',
++                'movement_pattern' => 'Pull',
++                'equipment_code' => 'EQ-CAB',
++                'laterality' => 'unilateral',
++                'exercise_category' => 'Compound',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Half-Kneeling Single Arm Cable Row',
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Split stance cable row',
++                'primary_muscle' => 'Back',
++                'secondary_muscles' => ['Core', 'Biceps', 'Forearms'],
++            ],
++            [
++                'canonical_name' => 'Seat Cable Row (V / Narrow Neutral Grip)',
++                'movement_pattern' => 'Pull',
++                'equipment_code' => 'EQ-CAB',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Compound',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Neutral Grip Seated 2 Arm Row',
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'V-grip narrow neutral cable row',
++                'primary_muscle' => 'Back',
++                'secondary_muscles' => ['Biceps', 'Forearms'],
++            ],
++            [
++                'canonical_name' => 'Plate Loaded Seated Row',
++                'movement_pattern' => 'Pull',
++                'equipment_code' => 'EQ-PLM',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Compound',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Machine Row',
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Plate-loaded seated row machine',
++                'primary_muscle' => 'Back',
++                'secondary_muscles' => ['Biceps', 'Forearms'],
++            ],
++            [
++                'canonical_name' => 'Face Pull',
++                'movement_pattern' => 'Pull',
++                'equipment_code' => 'EQ-CAB',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Standard face pull with rope',
++                'primary_muscle' => 'Rear Delts',
++                'secondary_muscles' => ['Traps', 'Rhomboids', 'External Rotators'],
++            ],
++            [
++                'canonical_name' => 'Face Pull (w External Rotation)',
++                'movement_pattern' => 'Pull',
++                'equipment_code' => 'EQ-CAB',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Face Pull',
++                'shoulder_safety_notes' => 'Monitor right shoulder during external rotation',
++                'notes' => 'Face pull with added external rotation component',
++                'primary_muscle' => 'Rear Delts',
++                'secondary_muscles' => ['External Rotators', 'Traps', 'Rhomboids'],
++            ],
++            [
++                'canonical_name' => 'Rear Delt Cable Fly',
++                'movement_pattern' => 'Pull',
++                'equipment_code' => 'EQ-CAB',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Face Pull',
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Standing cable rear delt fly',
++                'primary_muscle' => 'Rear Delts',
++                'secondary_muscles' => ['Rhomboids', 'Traps'],
++            ],
++            [
++                'canonical_name' => 'Chest Supported Rear Delt Fly',
++                'movement_pattern' => 'Pull',
++                'equipment_code' => 'EQ-DB',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Rear Delt Cable Fly',
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Incline bench chest-supported rear delt fly',
++                'primary_muscle' => 'Rear Delts',
++                'secondary_muscles' => ['Rhomboids', 'Traps'],
++            ],
++            [
++                'canonical_name' => 'Seated Single Arm DB Curl - Anchored',
++                'movement_pattern' => 'Isolation',
++                'equipment_code' => 'EQ-DB',
++                'laterality' => 'unilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Seated single-arm curl with opposite hand anchored',
++                'primary_muscle' => 'Biceps',
++                'secondary_muscles' => ['Forearms', 'Brachialis'],
++            ],
++            [
++                'canonical_name' => 'Anchored Single Arm Dumbbell Curl',
++                'movement_pattern' => 'Isolation',
++                'equipment_code' => 'EQ-DB',
++                'laterality' => 'unilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Seated Single Arm DB Curl - Anchored',
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Standing or seated anchored curl',
++                'primary_muscle' => 'Biceps',
++                'secondary_muscles' => ['Forearms', 'Brachialis'],
++            ],
++            [
++                'canonical_name' => 'Standing One Arm Extended Cable Curls',
++                'movement_pattern' => 'Isolation',
++                'equipment_code' => 'EQ-CAB',
++                'laterality' => 'unilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Cable curl with arm extended behind body',
++                'primary_muscle' => 'Biceps',
++                'secondary_muscles' => ['Forearms', 'Brachialis'],
++            ],
++            [
++                'canonical_name' => 'Standing One Arm Bicep Curl with Cable (Anchored)',
++                'movement_pattern' => 'Isolation',
++                'equipment_code' => 'EQ-CAB',
++                'laterality' => 'unilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Standing One Arm Extended Cable Curls',
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Cable curl with elbow anchored',
++                'primary_muscle' => 'Biceps',
++                'secondary_muscles' => ['Forearms', 'Brachialis'],
++            ],
++            [
++                'canonical_name' => 'Incline Dumbell Curl (Supinated)',
++                'movement_pattern' => 'Isolation',
++                'equipment_code' => 'EQ-DB',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Incline bench supinated dumbbell curl',
++                'primary_muscle' => 'Biceps',
++                'secondary_muscles' => ['Forearms'],
++            ],
++            [
++                'canonical_name' => 'Incline DB Hammer Curl',
++                'movement_pattern' => 'Isolation',
++                'equipment_code' => 'EQ-DB',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Incline Dumbell Curl (Supinated)',
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Incline bench hammer grip curl',
++                'primary_muscle' => 'Brachialis',
++                'secondary_muscles' => ['Biceps', 'Forearms'],
++            ],
++            [
++                'canonical_name' => 'DB Spider Curl (Hammer)',
++                'movement_pattern' => 'Isolation',
++                'equipment_code' => 'EQ-DB',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Spider curl on incline bench with hammer grip',
++                'primary_muscle' => 'Brachialis',
++                'secondary_muscles' => ['Biceps', 'Forearms'],
++            ],
++            [
++                'canonical_name' => 'Alternate Seated DB Curl',
++                'movement_pattern' => 'Isolation',
++                'equipment_code' => 'EQ-DB',
++                'laterality' => 'alternating',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Alternating seated dumbbell curl with supination',
++                'primary_muscle' => 'Biceps',
++                'secondary_muscles' => ['Forearms', 'Brachialis'],
++            ],
++            [
++                'canonical_name' => 'Single Arm Rope Curl (extended Arm Position)',
++                'movement_pattern' => 'Isolation',
++                'equipment_code' => 'EQ-CAB',
++                'laterality' => 'unilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Standing One Arm Extended Cable Curls',
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Single arm cable curl with rope grip',
++                'primary_muscle' => 'Biceps',
++                'secondary_muscles' => ['Brachialis', 'Forearms'],
++            ],
++            [
++                'canonical_name' => 'Hammer Curls with Rope and Cable',
++                'movement_pattern' => 'Isolation',
++                'equipment_code' => 'EQ-CAB',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Rope attachment hammer curl on cable',
++                'primary_muscle' => 'Brachialis',
++                'secondary_muscles' => ['Biceps', 'Forearms'],
++            ],
++            [
++                'canonical_name' => 'Cross Body Cable Curl',
++                'movement_pattern' => 'Isolation',
++                'equipment_code' => 'EQ-CAB',
++                'laterality' => 'unilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Cross-body cable curl',
++                'primary_muscle' => 'Biceps',
++                'secondary_muscles' => ['Brachialis', 'Forearms'],
++            ],
++            [
++                'canonical_name' => 'Standing Single Arm Cable Curl',
++                'movement_pattern' => 'Isolation',
++                'equipment_code' => 'EQ-CAB',
++                'laterality' => 'unilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Standing One Arm Extended Cable Curls',
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Standard single arm cable curl',
++                'primary_muscle' => 'Biceps',
++                'secondary_muscles' => ['Forearms', 'Brachialis'],
++            ],
++            [
++                'canonical_name' => 'Dumbbell Incline Curl',
++                'movement_pattern' => 'Isolation',
++                'equipment_code' => 'EQ-DB',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Incline Dumbell Curl (Supinated)',
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Incline dumbbell curl variant',
++                'primary_muscle' => 'Biceps',
++                'secondary_muscles' => ['Forearms'],
++            ],
++            [
++                'canonical_name' => '1 Arm Cable Curl',
++                'movement_pattern' => 'Isolation',
++                'equipment_code' => 'EQ-CAB',
++                'laterality' => 'unilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Single arm cable curl',
++                'primary_muscle' => 'Biceps',
++                'secondary_muscles' => ['Forearms'],
++            ],
++            [
++                'canonical_name' => 'Dumbbell: Squeeze Curl - Neutral',
++                'movement_pattern' => 'Isolation',
++                'equipment_code' => 'EQ-DB',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Dumbbell squeeze curl variations',
++                'primary_muscle' => 'Biceps',
++                'secondary_muscles' => ['Brachialis', 'Forearms'],
++            ],
++            [
++                'canonical_name' => 'Dumbbell: Squeeze Curl - Hammer',
++                'movement_pattern' => 'Isolation',
++                'equipment_code' => 'EQ-DB',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Hammer grip squeeze curl',
++                'primary_muscle' => 'Brachialis',
++                'secondary_muscles' => ['Biceps', 'Forearms'],
++            ],
++            [
++                'canonical_name' => 'DB Cross Body Curl (Hammer Grip)',
++                'movement_pattern' => 'Isolation',
++                'equipment_code' => 'EQ-DB',
++                'laterality' => 'unilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Cross body hammer curl with dumbbell',
++                'primary_muscle' => 'Brachialis',
++                'secondary_muscles' => ['Biceps', 'Forearms'],
++            ],
++            [
++                'canonical_name' => 'Neutral Grip Dumbbell Floor Press',
++                'movement_pattern' => 'Push',
++                'equipment_code' => 'EQ-DB',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Compound',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Right anterior capsule awareness during heavy sets; neutral grip well tolerated',
++                'notes' => 'Primary pressing movement from Phase 6 onward',
++                'primary_muscle' => 'Chest',
++                'secondary_muscles' => ['Triceps', 'Anterior Delts'],
++            ],
++            [
++                'canonical_name' => 'Smith Machine Bench Press',
++                'movement_pattern' => 'Push',
++                'equipment_code' => 'EQ-SM',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Compound',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Neutral Grip Dumbbell Floor Press',
++                'shoulder_safety_notes' => 'Right anterior capsule tightness; monitor closely',
++                'notes' => 'Used in Phases 3-4',
++                'primary_muscle' => 'Chest',
++                'secondary_muscles' => ['Triceps', 'Anterior Delts'],
++            ],
++            [
++                'canonical_name' => 'Supine Press Machine - Plate Loaded (Planet Fitness)',
++                'movement_pattern' => 'Push',
++                'equipment_code' => 'EQ-PLM',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Compound',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Neutral Grip Dumbbell Floor Press',
++                'shoulder_safety_notes' => 'Some right capsule tightness at higher weights',
++                'notes' => 'Planet Fitness specific plate-loaded press',
++                'primary_muscle' => 'Chest',
++                'secondary_muscles' => ['Triceps', 'Anterior Delts'],
++            ],
++            [
++                'canonical_name' => 'DB Neutral Press (slight Rotate To Underhand)',
++                'movement_pattern' => 'Push',
++                'equipment_code' => 'EQ-DB',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Compound',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Neutral Grip Dumbbell Floor Press',
++                'shoulder_safety_notes' => 'Neutral grip well tolerated',
++                'notes' => 'Floor press or bench press with neutral grip and slight underhand rotation',
++                'primary_muscle' => 'Chest',
++                'secondary_muscles' => ['Triceps', 'Anterior Delts'],
++            ],
++            [
++                'canonical_name' => 'Low-Incline DB Press (15-30°)',
++                'movement_pattern' => 'Push',
++                'equipment_code' => 'EQ-DB',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Compound',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Left trap compensation noted; monitor',
++                'notes' => 'Low incline dumbbell press',
++                'primary_muscle' => 'Upper Chest',
++                'secondary_muscles' => ['Triceps', 'Anterior Delts'],
++            ],
++            [
++                'canonical_name' => 'Single Arm Cable Press',
++                'movement_pattern' => 'Push',
++                'equipment_code' => 'EQ-CAB',
++                'laterality' => 'unilateral',
++                'exercise_category' => 'Compound',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Right extension not as strong as left; some trap recruitment',
++                'notes' => 'Single arm cable press in split stance',
++                'primary_muscle' => 'Chest',
++                'secondary_muscles' => ['Triceps', 'Anterior Delts', 'Core'],
++            ],
++            [
++                'canonical_name' => 'Single Arm Cable Press (split stance)',
++                'movement_pattern' => 'Push',
++                'equipment_code' => 'EQ-CAB',
++                'laterality' => 'unilateral',
++                'exercise_category' => 'Compound',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Single Arm Cable Press',
++                'shoulder_safety_notes' => 'Right extension not as strong as left',
++                'notes' => 'Split stance variant',
++                'primary_muscle' => 'Chest',
++                'secondary_muscles' => ['Triceps', 'Anterior Delts', 'Core'],
++            ],
++            [
++                'canonical_name' => 'Machine Chest Press',
++                'movement_pattern' => 'Push',
++                'equipment_code' => 'EQ-LF-CP',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Compound',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Neutral Grip Dumbbell Floor Press',
++                'shoulder_safety_notes' => 'Right anterior capsule awareness on eccentric',
++                'notes' => 'Selectorized chest press machine',
++                'primary_muscle' => 'Chest',
++                'secondary_muscles' => ['Triceps', 'Anterior Delts'],
++            ],
++            [
++                'canonical_name' => 'Single-Arm Vertical Plate Balance Press',
++                'movement_pattern' => 'Push',
++                'equipment_code' => 'EQ-PLT',
++                'laterality' => 'unilateral',
++                'exercise_category' => 'Compound',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Left has more control than right',
++                'notes' => 'Vertical plate balance floor press',
++                'primary_muscle' => 'Chest',
++                'secondary_muscles' => ['Triceps', 'Stabilizers', 'Core'],
++            ],
++            [
++                'canonical_name' => 'Single-Arm DB Balance Press',
++                'movement_pattern' => 'Push',
++                'equipment_code' => 'EQ-DB',
++                'laterality' => 'unilateral',
++                'exercise_category' => 'Compound',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Single-Arm Vertical Plate Balance Press',
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Single arm DB balance press',
++                'primary_muscle' => 'Chest',
++                'secondary_muscles' => ['Triceps', 'Stabilizers', 'Core'],
++            ],
++            [
++                'canonical_name' => 'Cable Fly (Standing)',
++                'movement_pattern' => 'Push',
++                'equipment_code' => 'EQ-CAB',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated with cuff attachment',
++                'notes' => 'Standing cable fly',
++                'primary_muscle' => 'Chest',
++                'secondary_muscles' => ['Anterior Delts'],
++            ],
++            [
++                'canonical_name' => 'Cable High To Mid Fly',
++                'movement_pattern' => 'Push',
++                'equipment_code' => 'EQ-CAB',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Cable Fly (Standing)',
++                'shoulder_safety_notes' => 'Right tightness at full extension; slightly shorten ROM',
++                'notes' => 'High to mid cable fly',
++                'primary_muscle' => 'Chest',
++                'secondary_muscles' => ['Anterior Delts'],
++            ],
++            [
++                'canonical_name' => 'Pec Fly',
++                'movement_pattern' => 'Push',
++                'equipment_code' => 'EQ-MCH',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Cable Fly (Standing)',
++                'shoulder_safety_notes' => 'Right sensitive with quick movement',
++                'notes' => 'Machine pec fly',
++                'primary_muscle' => 'Chest',
++                'secondary_muscles' => ['Anterior Delts'],
++            ],
++            [
++                'canonical_name' => 'High Cable Tricep Pushdown',
++                'movement_pattern' => 'Isolation',
++                'equipment_code' => 'EQ-CAB',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Shoulders roll forward if ROM too high; keep 90-100 degree ROM',
++                'notes' => 'High cable tricep pushdown with straight bar',
++                'primary_muscle' => 'Triceps',
++                'secondary_muscles' => ['Forearms'],
++            ],
++            [
++                'canonical_name' => 'Rope Push-Downs',
++                'movement_pattern' => 'Isolation',
++                'equipment_code' => 'EQ-CAB',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'High Cable Tricep Pushdown',
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Rope attachment pushdown',
++                'primary_muscle' => 'Triceps',
++                'secondary_muscles' => ['Forearms'],
++            ],
++            [
++                'canonical_name' => 'Single-Arm Overhead Cable Extension',
++                'movement_pattern' => 'Isolation',
++                'equipment_code' => 'EQ-CAB',
++                'laterality' => 'unilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Feels good on anterior capsule; seems to loosen it',
++                'notes' => 'Single arm overhead cable extension',
++                'primary_muscle' => 'Triceps',
++                'secondary_muscles' => [],
++            ],
++            [
++                'canonical_name' => 'Single Arm Cable Extensions',
++                'movement_pattern' => 'Isolation',
++                'equipment_code' => 'EQ-CAB',
++                'laterality' => 'unilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Single-Arm Overhead Cable Extension',
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'General single arm cable extension',
++                'primary_muscle' => 'Triceps',
++                'secondary_muscles' => [],
++            ],
++            [
++                'canonical_name' => 'Cable Triceps Extension - Quad',
++                'movement_pattern' => 'Isolation',
++                'equipment_code' => 'EQ-CAB',
++                'laterality' => 'unilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated; significant left-right asymmetry noted',
++                'notes' => 'Four-position cable tricep extension',
++                'primary_muscle' => 'Triceps',
++                'secondary_muscles' => [],
++            ],
++            [
++                'canonical_name' => 'Kneeling Single Arm Rope Cable Extension',
++                'movement_pattern' => 'Isolation',
++                'equipment_code' => 'EQ-CAB',
++                'laterality' => 'unilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Single-Arm Overhead Cable Extension',
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Kneeling single arm rope extension',
++                'primary_muscle' => 'Triceps',
++                'secondary_muscles' => [],
++            ],
++            [
++                'canonical_name' => 'Standing Single Arm Extension (D-Grip)',
++                'movement_pattern' => 'Isolation',
++                'equipment_code' => 'EQ-CAB',
++                'laterality' => 'unilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Single Arm Cable Extensions',
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'D-grip single arm cable extension',
++                'primary_muscle' => 'Triceps',
++                'secondary_muscles' => [],
++            ],
++            [
++                'canonical_name' => 'Single-Arm Cable Triceps Extension (Cross-Body)',
++                'movement_pattern' => 'Isolation',
++                'equipment_code' => 'EQ-CAB',
++                'laterality' => 'unilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Single Arm Cable Extensions',
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Cross body cable tricep extension',
++                'primary_muscle' => 'Triceps',
++                'secondary_muscles' => [],
++            ],
++            [
++                'canonical_name' => 'Cable Push-Downs',
++                'movement_pattern' => 'Isolation',
++                'equipment_code' => 'EQ-CAB',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Rope Push-Downs',
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'General cable pushdown',
++                'primary_muscle' => 'Triceps',
++                'secondary_muscles' => [],
++            ],
++            [
++                'canonical_name' => 'Cable: Kneeling 1Arm Overhead Extension',
++                'movement_pattern' => 'Isolation',
++                'equipment_code' => 'EQ-CAB',
++                'laterality' => 'unilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Single-Arm Overhead Cable Extension',
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Kneeling overhead cable extension',
++                'primary_muscle' => 'Triceps',
++                'secondary_muscles' => [],
++            ],
++            [
++                'canonical_name' => 'Inverted KB Press',
++                'movement_pattern' => 'Push',
++                'equipment_code' => 'EQ-KB',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Compound',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Floor press with inverted kettlebell',
++                'primary_muscle' => 'Chest',
++                'secondary_muscles' => ['Triceps', 'Stabilizers'],
++            ],
++            [
++                'canonical_name' => 'Dumbbell Romanian Deadlift',
++                'movement_pattern' => 'Hinge',
++                'equipment_code' => 'EQ-DB',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Compound',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated; grip limiting factor at heavy weights',
++                'notes' => 'Primary hinge movement',
++                'primary_muscle' => 'Hamstrings',
++                'secondary_muscles' => ['Glutes', 'Lower Back', 'Forearms'],
++            ],
++            [
++                'canonical_name' => 'Bulgarian Split Squat',
++                'movement_pattern' => 'Squat',
++                'equipment_code' => 'EQ-DB',
++                'laterality' => 'unilateral',
++                'exercise_category' => 'Compound',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Rear foot elevated split squat',
++                'primary_muscle' => 'Quads',
++                'secondary_muscles' => ['Glutes', 'Hamstrings', 'Core'],
++            ],
++            [
++                'canonical_name' => 'Smith Machine Split Squat (rear foot elevated optional)',
++                'movement_pattern' => 'Squat',
++                'equipment_code' => 'EQ-SM',
++                'laterality' => 'unilateral',
++                'exercise_category' => 'Compound',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Bulgarian Split Squat',
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Smith machine split squat',
++                'primary_muscle' => 'Quads',
++                'secondary_muscles' => ['Glutes', 'Hamstrings', 'Core'],
++            ],
++            [
++                'canonical_name' => 'Goblet Squat',
++                'movement_pattern' => 'Squat',
++                'equipment_code' => 'EQ-DB',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Compound',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Dumbbell or kettlebell goblet squat',
++                'primary_muscle' => 'Quads',
++                'secondary_muscles' => ['Glutes', 'Core', 'Hamstrings'],
++            ],
++            [
++                'canonical_name' => 'Prisoners Squat',
++                'movement_pattern' => 'Squat',
++                'equipment_code' => 'EQ-BW',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Warmup',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Bodyweight squat with hands behind head',
++                'primary_muscle' => 'Quads',
++                'secondary_muscles' => ['Glutes', 'Core'],
++            ],
++            [
++                'canonical_name' => 'Walking Lunges',
++                'movement_pattern' => 'Squat',
++                'equipment_code' => 'EQ-DB',
++                'laterality' => 'alternating',
++                'exercise_category' => 'Compound',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Walking lunge with dumbbells or kettlebell',
++                'primary_muscle' => 'Quads',
++                'secondary_muscles' => ['Glutes', 'Hamstrings', 'Calves'],
++            ],
++            [
++                'canonical_name' => 'Reverse Lunge',
++                'movement_pattern' => 'Squat',
++                'equipment_code' => 'EQ-BW',
++                'laterality' => 'alternating',
++                'exercise_category' => 'Compound',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Walking Lunges',
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Reverse stepping lunge',
++                'primary_muscle' => 'Quads',
++                'secondary_muscles' => ['Glutes', 'Hamstrings'],
++            ],
++            [
++                'canonical_name' => 'Front-Foot-Elevated Split Squat',
++                'movement_pattern' => 'Squat',
++                'equipment_code' => 'EQ-DB',
++                'laterality' => 'unilateral',
++                'exercise_category' => 'Compound',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Bulgarian Split Squat',
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Front foot on plates for increased ROM',
++                'primary_muscle' => 'Quads',
++                'secondary_muscles' => ['Glutes', 'Hamstrings', 'Core'],
++            ],
++            [
++                'canonical_name' => 'Standing Calf Raise',
++                'movement_pattern' => 'Isolation',
++                'equipment_code' => 'EQ-SM',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Smith machine or barbell calf raise',
++                'primary_muscle' => 'Calves',
++                'secondary_muscles' => [],
++            ],
++            [
++                'canonical_name' => 'Barbell Standing Calf Raise',
++                'movement_pattern' => 'Isolation',
++                'equipment_code' => 'EQ-BB',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Standing Calf Raise',
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Barbell calf raise on plates',
++                'primary_muscle' => 'Calves',
++                'secondary_muscles' => [],
++            ],
++            [
++                'canonical_name' => 'Seated Calf Raise',
++                'movement_pattern' => 'Isolation',
++                'equipment_code' => 'EQ-MCH',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Standing Calf Raise',
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Seated calf raise machine',
++                'primary_muscle' => 'Calves',
++                'secondary_muscles' => [],
++            ],
++            [
++                'canonical_name' => 'Calf Extension (Machine)',
++                'movement_pattern' => 'Isolation',
++                'equipment_code' => 'EQ-MCH',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Standing Calf Raise',
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Calf extension on leg press or machine',
++                'primary_muscle' => 'Calves',
++                'secondary_muscles' => [],
++            ],
++            [
++                'canonical_name' => 'Glute Extension',
++                'movement_pattern' => 'Isolation',
++                'equipment_code' => 'EQ-MCH',
++                'laterality' => 'unilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Machine glute extension',
++                'primary_muscle' => 'Glutes',
++                'secondary_muscles' => ['Hamstrings'],
++            ],
++            [
++                'canonical_name' => 'Dumbbell Lateral Raise',
++                'movement_pattern' => 'Isolation',
++                'equipment_code' => 'EQ-DB',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Slight right anterior capsule awareness at top; better with slight pronation',
++                'notes' => 'Dumbbell lateral raise',
++                'primary_muscle' => 'Lateral Delts',
++                'secondary_muscles' => ['Traps'],
++            ],
++            [
++                'canonical_name' => 'Cable Lateral Raise (using elbow strap setup)',
++                'movement_pattern' => 'Isolation',
++                'equipment_code' => 'EQ-CAB',
++                'laterality' => 'unilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Dumbbell Lateral Raise',
++                'shoulder_safety_notes' => 'Well tolerated with elbow strap',
++                'notes' => 'Cable lateral raise using strap at elbow',
++                'primary_muscle' => 'Lateral Delts',
++                'secondary_muscles' => ['Traps'],
++            ],
++            [
++                'canonical_name' => 'Seated Neutral Grip DB Overhead Press',
++                'movement_pattern' => 'Push',
++                'equipment_code' => 'EQ-DB',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Compound',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Subtle anterior capsule awareness on descending; tolerance improving',
++                'notes' => 'Seated dumbbell overhead press with neutral grip',
++                'primary_muscle' => 'Shoulders',
++                'secondary_muscles' => ['Triceps', 'Upper Chest'],
++            ],
++            [
++                'canonical_name' => 'Half-Kneeling Single-Arm DB Press',
++                'movement_pattern' => 'Push',
++                'equipment_code' => 'EQ-DB',
++                'laterality' => 'unilateral',
++                'exercise_category' => 'Compound',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Half-kneeling single arm overhead press',
++                'primary_muscle' => 'Shoulders',
++                'secondary_muscles' => ['Triceps', 'Core'],
++            ],
++            [
++                'canonical_name' => 'Pallof Press',
++                'movement_pattern' => 'Core',
++                'equipment_code' => 'EQ-CAB',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Core',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated; left side requires more anti-rotation effort',
++                'notes' => 'Anti-rotation cable press',
++                'primary_muscle' => 'Core',
++                'secondary_muscles' => ['Obliques'],
++            ],
++            [
++                'canonical_name' => 'Side Plank',
++                'movement_pattern' => 'Core',
++                'equipment_code' => 'EQ-BW',
++                'laterality' => 'unilateral',
++                'exercise_category' => 'Core',
++                'is_time_based' => true,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Right shoulder feels looser than left on elbow; palm better tolerated',
++                'notes' => 'Isometric lateral core stability',
++                'primary_muscle' => 'Obliques',
++                'secondary_muscles' => ['Core', 'Shoulders'],
++            ],
++            [
++                'canonical_name' => 'Dead Hang',
++                'movement_pattern' => 'Hold',
++                'equipment_code' => 'EQ-BW',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Hold',
++                'is_time_based' => true,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Good scapular reset',
++                'notes' => 'Passive hang from pull-up bar',
++                'primary_muscle' => 'Forearms',
++                'secondary_muscles' => ['Lats', 'Shoulders'],
++            ],
++            [
++                'canonical_name' => 'Plate Pinch',
++                'movement_pattern' => 'Hold',
++                'equipment_code' => 'EQ-PLT',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Hold',
++                'is_time_based' => true,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Pinch grip hold with weight plates',
++                'primary_muscle' => 'Forearms',
++                'secondary_muscles' => ['Fingers'],
++            ],
++            [
++                'canonical_name' => 'Captains Chair Knee Raises',
++                'movement_pattern' => 'Core',
++                'equipment_code' => 'EQ-MCH',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Core',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Little tightness in right shoulder cap',
++                'notes' => 'Hanging knee raise on captain\'s chair',
++                'primary_muscle' => 'Core',
++                'secondary_muscles' => ['Hip Flexors'],
++            ],
++            [
++                'canonical_name' => 'Hanging Knee Raises',
++                'movement_pattern' => 'Core',
++                'equipment_code' => 'EQ-BW',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Core',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Captains Chair Knee Raises',
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Hanging knee raise from pull-up bar',
++                'primary_muscle' => 'Core',
++                'secondary_muscles' => ['Hip Flexors', 'Forearms'],
++            ],
++            [
++                'canonical_name' => 'Tibia Flex',
++                'movement_pattern' => 'Isolation',
++                'equipment_code' => 'EQ-PLT',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Isolation',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Plate on toe tibialis anterior flexion',
++                'primary_muscle' => 'Tibialis Anterior',
++                'secondary_muscles' => [],
++            ],
++            [
++                'canonical_name' => 'Rowing',
++                'movement_pattern' => 'Cardio',
++                'equipment_code' => 'EQ-C2',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Cardio',
++                'is_time_based' => true,
++                'is_distance_based' => true,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Concept2 or similar rowing ergometer',
++                'primary_muscle' => 'Full Body',
++                'secondary_muscles' => ['Legs', 'Back', 'Arms'],
++            ],
++            [
++                'canonical_name' => 'Treadmill Walking',
++                'movement_pattern' => 'Cardio',
++                'equipment_code' => 'EQ-TM',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Cardio',
++                'is_time_based' => true,
++                'is_distance_based' => true,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Treadmill walking at various inclines',
++                'primary_muscle' => 'Full Body',
++                'secondary_muscles' => ['Legs', 'Core'],
++            ],
++            [
++                'canonical_name' => 'Cycling',
++                'movement_pattern' => 'Cardio',
++                'equipment_code' => 'EQ-BIKE',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Cardio',
++                'is_time_based' => true,
++                'is_distance_based' => true,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Stationary cycling',
++                'primary_muscle' => 'Legs',
++                'secondary_muscles' => ['Core'],
++            ],
++            [
++                'canonical_name' => 'Endless Rope',
++                'movement_pattern' => 'Cardio',
++                'equipment_code' => 'EQ-ER',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Cardio',
++                'is_time_based' => true,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Slight anterior capsule trigger on right at initial reach',
++                'notes' => 'Marpo Kinetics or similar endless rope machine',
++                'primary_muscle' => 'Forearms',
++                'secondary_muscles' => ['Back', 'Shoulders', 'Biceps'],
++            ],
++            [
++                'canonical_name' => 'Push-up',
++                'movement_pattern' => 'Push',
++                'equipment_code' => 'EQ-BW',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Compound',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Little anterior right tightness on lowering',
++                'notes' => 'Full push-up from toes',
++                'primary_muscle' => 'Chest',
++                'secondary_muscles' => ['Triceps', 'Anterior Delts', 'Core'],
++            ],
++            [
++                'canonical_name' => 'Push-up On Knees',
++                'movement_pattern' => 'Push',
++                'equipment_code' => 'EQ-BW',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Compound',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Push-up',
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Modified push-up from knees',
++                'primary_muscle' => 'Chest',
++                'secondary_muscles' => ['Triceps', 'Anterior Delts', 'Core'],
++            ],
++            [
++                'canonical_name' => 'Incline Push-up',
++                'movement_pattern' => 'Push',
++                'equipment_code' => 'EQ-BW',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Compound',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Push-up',
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Push-up with hands elevated on bar or bench',
++                'primary_muscle' => 'Chest',
++                'secondary_muscles' => ['Triceps', 'Anterior Delts', 'Core'],
++            ],
++            [
++                'canonical_name' => 'Scap Push Ups',
++                'movement_pattern' => 'Mobility',
++                'equipment_code' => 'EQ-BW',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Warmup',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Scapular protraction/retraction from push-up position',
++                'primary_muscle' => 'Serratus Anterior',
++                'secondary_muscles' => ['Shoulders'],
++            ],
++            [
++                'canonical_name' => 'Band Pull Aparts',
++                'movement_pattern' => 'Mobility',
++                'equipment_code' => 'EQ-BAND',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Warmup',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Band pull apart for shoulder warmup',
++                'primary_muscle' => 'Rear Delts',
++                'secondary_muscles' => ['Rhomboids', 'Traps'],
++            ],
++            [
++                'canonical_name' => 'Band External Rotations',
++                'movement_pattern' => 'Mobility',
++                'equipment_code' => 'EQ-BAND',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Warmup',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Banded external rotation warmup',
++                'primary_muscle' => 'External Rotators',
++                'secondary_muscles' => ['Rotator Cuff'],
++            ],
++            [
++                'canonical_name' => 'Serratus Wall Slides (banded)',
++                'movement_pattern' => 'Mobility',
++                'equipment_code' => 'EQ-BAND',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Warmup',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Wall slide with band around wrists',
++                'primary_muscle' => 'Serratus Anterior',
++                'secondary_muscles' => ['Shoulders', 'Traps'],
++            ],
++            [
++                'canonical_name' => 'Cat-Camel',
++                'movement_pattern' => 'Mobility',
++                'equipment_code' => 'EQ-BW',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Warmup',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Spinal flexion/extension mobilization',
++                'primary_muscle' => 'Spine',
++                'secondary_muscles' => ['Core'],
++            ],
++            [
++                'canonical_name' => 'Cable External Rotation',
++                'movement_pattern' => 'Mobility',
++                'equipment_code' => 'EQ-CAB',
++                'laterality' => 'unilateral',
++                'exercise_category' => 'Warmup',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Band External Rotations',
++                'shoulder_safety_notes' => 'Left has less ROM than right',
++                'notes' => 'Cable external rotation',
++                'primary_muscle' => 'External Rotators',
++                'secondary_muscles' => ['Rotator Cuff'],
++            ],
++            [
++                'canonical_name' => 'Inverted KB Hold',
++                'movement_pattern' => 'Mobility',
++                'equipment_code' => 'EQ-KB',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Rehab',
++                'is_time_based' => true,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Inverted kettlebell hold for shoulder stability',
++                'primary_muscle' => 'Shoulders',
++                'secondary_muscles' => ['Forearms', 'Stabilizers'],
++            ],
++            [
++                'canonical_name' => 'Vertical DB Scap extension',
++                'movement_pattern' => 'Mobility',
++                'equipment_code' => 'EQ-DB',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Rehab',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Vertical dumbbell or plate scapular extension',
++                'primary_muscle' => 'Serratus Anterior',
++                'secondary_muscles' => ['Shoulders'],
++            ],
++            [
++                'canonical_name' => 'Hip Hinge',
++                'movement_pattern' => 'Mobility',
++                'equipment_code' => 'EQ-BW',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Warmup',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Bodyweight hip hinge pattern warmup',
++                'primary_muscle' => 'Hamstrings',
++                'secondary_muscles' => ['Glutes', 'Lower Back'],
++            ],
++            [
++                'canonical_name' => 'Cable Pull-Through',
++                'movement_pattern' => 'Hinge',
++                'equipment_code' => 'EQ-CAB',
++                'laterality' => 'bilateral',
++                'exercise_category' => 'Compound',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => null,
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Cable pull-through for hip extension',
++                'primary_muscle' => 'Glutes',
++                'secondary_muscles' => ['Hamstrings', 'Lower Back'],
++            ],
++            [
++                'canonical_name' => 'Half-Kneeling Single-Arm Cable Pulldown',
++                'movement_pattern' => 'Pull',
++                'equipment_code' => 'EQ-CAB',
++                'laterality' => 'unilateral',
++                'exercise_category' => 'Compound',
++                'is_time_based' => false,
++                'is_distance_based' => false,
++                'preferred_replacements' => 'Single-Arm Neutral Grip Cable Pulldown',
++                'shoulder_safety_notes' => 'Well tolerated',
++                'notes' => 'Half-kneeling single arm cable pulldown',
++                'primary_muscle' => 'Lats',
++                'secondary_muscles' => ['Biceps', 'Forearms'],
++            ],
++        ];
++
++        foreach ($rows as $row) {
++            $equipment = $row['equipment_code'] ? Equipment::where('external_code', $row['equipment_code'])->first() : null;
++
++            $exercise = Exercise::updateOrCreate(
++                ['canonical_name' => $row['canonical_name']],
++                [
++                    'movement_pattern' => $row['movement_pattern'],
++                    'equipment_id' => $equipment?->id,
++                    'laterality' => $row['laterality'],
++                    'exercise_category' => $row['exercise_category'],
++                    'is_time_based' => $row['is_time_based'],
++                    'is_distance_based' => $row['is_distance_based'],
++                    'preferred_replacements' => $row['preferred_replacements'],
++                    'shoulder_safety_notes' => $row['shoulder_safety_notes'],
++                    'notes' => $row['notes'],
++                ]
++            );
++
++            $structureIds = [];
++            if ($primary = BodyStructure::where('name', $row['primary_muscle'])->first()) {
++                $structureIds[$primary->id] = ['role' => 'primary'];
++            }
++            foreach ($row['secondary_muscles'] as $name) {
++                if ($structure = BodyStructure::where('name', $name)->first()) {
++                    $structureIds[$structure->id] = ['role' => 'secondary'];
++                }
++            }
++            $exercise->bodyStructures()->sync($structureIds);
++        }
++    }
++}

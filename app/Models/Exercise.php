@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Exercise extends Model
@@ -14,15 +16,7 @@ class Exercise extends Model
     protected $fillable = [
         'canonical_name',
         'movement_pattern',
-        'muscle_group',
-        'category',
-        'equipment_type',
-        'is_unilateral',
-        'is_timed',
-        'safety_notes',
-        'primary_muscle',
-        'secondary_muscles',
-        'default_equipment_id',
+        'equipment_id',
         'laterality',
         'exercise_category',
         'is_time_based',
@@ -33,11 +27,31 @@ class Exercise extends Model
     ];
 
     protected $casts = [
-        'is_unilateral' => 'boolean',
-        'is_timed' => 'boolean',
         'is_time_based' => 'boolean',
         'is_distance_based' => 'boolean',
     ];
+
+    public function equipment(): BelongsTo
+    {
+        return $this->belongsTo(Equipment::class, 'equipment_id');
+    }
+
+    public function bodyStructures(): BelongsToMany
+    {
+        return $this->belongsToMany(BodyStructure::class, 'exercise_body_structures')
+            ->withPivot('role')
+            ->withTimestamps();
+    }
+
+    public function primaryBodyStructures(): BelongsToMany
+    {
+        return $this->bodyStructures()->wherePivot('role', 'primary');
+    }
+
+    public function secondaryBodyStructures(): BelongsToMany
+    {
+        return $this->bodyStructures()->wherePivot('role', 'secondary');
+    }
 
     public function nameMaps(): HasMany
     {
