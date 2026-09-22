@@ -23,5 +23,17 @@ class SystemBadgeSeeder extends Seeder
                 'is_repeatable' => true,
             ]
         );
+
+        AchievementDefinition::updateOrCreate(
+            ['code' => 'ANATOMY_INSIGHT'],
+            [
+                'name' => 'Anatomy Insight',
+                'description' => 'Learned about a muscle, tendon, ligament, or functional structure via the Momentum Coach guide.',
+                'category' => 'education',
+                'rule_json' => ['trigger' => 'manual', 'event' => 'body_structure_learned'],
+                'xp_value' => 10,
+                'is_repeatable' => true,
+            ]
+        );
     }
 }
