@@ -1,121 +1,129 @@
-# Bulldog Statbook — Free Baseball & Softball Statbook Platform
+# Bulldog
 
-> **Status:** MVP Core Complete (Waves 1–7 Verified)  
-> **Brand Ecosystem:** Bulldog Stats & Sports Innovation  
-> **Target Subdomain:** `statbook.bulldogstats.com` (Separate hosted web app from main WordPress site)
+Bulldog is the Laravel application and backend platform for the Bulldog ecosystem, supporting both Statbook and Momentum training services.
 
----
+> `bulldogstats.com` is a separate WordPress site and is completely separate from this repository.
 
-## ⚾ About Bulldog Statbook
+## Current scope
 
-**Bulldog Statbook** is the flagship sports-operations application within the **Bulldog Stats & Sports Innovation** ecosystem. It is a free baseball and softball Statbook designed to turn every game into persistent player, team, season, and career history.
+### Statbook
+- Baseball and softball teams, rosters, games, scoring, rulesets, imports, statistics, identity, milestones, and sharing
+- Separate `User` and `PlayerIdentity` identity model
+- Event-driven scoring with rebuildable projections
+- Configurable sport rulesets
+- Historical imports with provenance and XP safeguards
+- Transaction-safe identity merging
+- Youth privacy and controlled sharing
 
-Unlike traditional scorekeeping apps, Bulldog Statbook is built on a **persistent identity and event-driven progression platform**:
-* **Game → Events → Statistics → Season History → Career History → Milestones & Records → Shareable Artifacts**
+### Momentum services
+- Exercise and body-structure catalogs
+- Training sessions and sets
+- Training personalization, goals, equipment, and guardrails
+- PR and achievement support
+- Coach AI card generation
+- Sanctum-protected versioned API
 
----
+## Stack
 
-## 🚀 Key App Capabilities (Waves 1–7)
+- PHP 8.2+
+- Laravel 12
+- Laravel Sanctum 4.3
+- Blade
+- Alpine.js
+- Tailwind CSS
+- Vite 7
+- Eloquent
+- PHPUnit 11
+- SQLite for local development/testing by default
 
-- **Permanent Identity Model:** Strict separation between `User` account and `PlayerIdentity`. Coaches can add unclaimed players to rosters before athletes register accounts.
-- **Contextual Team & Role Management:** Flexible authorization supporting `team_admin`, `coach`, `scorekeeper`, and `viewer` roles per team context.
-- **Game Scheduling & Ruleset Engine:** Configurable sport rulesets (`config_json`) supporting Little League, NFHS High School Baseball, NFHS Fastpitch Softball, USSSA, and USA Softball (ASA) slowpitch formats.
-- **Live Play-by-Play Scoring Interface:** Real-time logging of pitches, hits, walks, strikeouts, stolen bases, and substitutions with automated base-runner advancement and count tracking.
-- **Real-Time Statistical Projections:** Raw events (`game_events`) serve as the single source of truth. Player (`game_player_stats`) and team (`game_team_stats`) statistics are dynamically derived projection caches that can be transactionally rebuilt at any time.
-- **Historical CSV Imports & Provenance:** Import prior offline seasons with explicit source labeling (`historical_imports`), fidelity disclosures, and an absolute firewall blocking imported stats from granting app Experience Points (XP).
-- **Milestones & Youth-Safe Share Cards:** Auto-detection of career achievements, hitting streaks, and thresholds with minor-protected share card rendering (`noindex, nofollow` meta directives).
-- **Admin Duplicate Resolver:** Transaction-safe administrative merging (`MergePlayerIdentitiesAction`) to resolve split player profiles without data loss or stat drift.
+Filament v3 is part of the intended Bulldog application stack, but the current `composer.json` does not declare `filament/filament`. Do not change that dependency as part of documentation work.
 
----
+## Repository boundaries
 
-## 🛠️ Stack & Infrastructure Architecture
+```text
+bulldogstats.com
+  WordPress public/marketing site
+  Separate codebase and deployment
 
-- **Framework:** Laravel 11 (PHP 8.2+)
-- **Database:** MySQL on DreamHost (Beta) / SQLite (Local & Testing) with PostgreSQL-compatible schema discipline
-- **Frontend:** Laravel Blade + Vanilla JS + Responsive Whalers-inspired Design Tokens (`--navy`, `--green`)
-- **Key Testing:** PHPUnit integration suite (`ScoringIntegrationTest.php`) verifying 27+ assertions on live scoring and stat calculation
+Bulldog
+  Laravel 12 application
+  + Statbook
+  + Statbook API
+  + Momentum training API
 
----
-
-## 🏃 Quickstart Guide (GitHub Codespaces / Local Setup)
-
-### 1. Clone & Install Dependencies
-```bash
-git clone https://github.com/your-org/bulldog-statbook.git
-cd bulldog-statbook
-composer install
+momentum-train
+  Separate static vanilla-JS PWA
+  + local-first planning/logging
+  + optional Bulldog API integration
 ```
 
-### 2. Configure Environment
+## Installation
+
 ```bash
+git clone https://github.com/rothb6456-lang/Bulldog.git
+cd Bulldog
+composer install
+npm install
 cp .env.example .env
 php artisan key:generate
-```
-
-Ensure your `.env` contains:
-```env
-APP_ENV=local
-APP_DEBUG=true
-DB_CONNECTION=sqlite
-DB_DATABASE=/workspaces/Bulldog/database/database.sqlite
-SESSION_DRIVER=file
-```
-
-### 3. Run Migrations & Seeders
-```bash
+touch database/database.sqlite
 php artisan migrate:fresh --seed
+npm run build
 ```
-*This populates sports (`baseball`, `softball`) and default competition rulesets (`Little League`, `NFHS Baseball`, `NFHS Softball`, `USSSA`, `USA Softball`).*
 
-### 4. Execute Integration Test Suite
+The checked-in `.env.example` uses SQLite via `DB_CONNECTION=sqlite`.
+
+## Local development
+
 ```bash
+composer run dev
+```
+
+Server only:
+```bash
+php artisan serve
+```
+
+Vite only:
+```bash
+npm run dev
+```
+
+## Testing
+
+```bash
+php artisan test
 php artisan test --filter=ScoringIntegrationTest
 ```
 
-### 5. Start Development Server
-```bash
-php artisan serve --port=8000
-```
-Open your browser at `http://localhost:8000` or use your Codespace browser preview.
+## API boundary
 
----
+Current Momentum training routes are Sanctum-protected and versioned under `/api/v1`:
 
-## 📁 Key File Structure
-
-```
-├── app/
-│   ├── Actions/            # Transactional business workflows (Scoring, Imports, Merges)
-│   ├── Http/Controllers/  # Thin Web and API controllers
-│   ├── Models/             # Eloquent Models with UUID traits
-│   └── Policies/           # Context-aware authorization policies (GamePolicy, TeamPolicy)
-├── database/
-│   ├── migrations/         # PostgreSQL-portable UUID migration schemas
-│   └── seeders/            # SportSeeder and RulesetSeeder
-├── resources/views/
-│   ├── admin/              # Duplicate-resolver workspace
-│   ├── games/              # Scheduler, visual workspace (show), live scorer (score)
-│   ├── imports/            # Multipage CSV import wizard
-│   ├── profile/            # Career history profile
-│   ├── sharing/            # Minor-safe share card layout
-│   └── teams/              # Team detail workspace & roster management
-├── routes/
-│   ├── api.php             # API v1 endpoints
-│   └── web.php             # Session-authenticated web routes
-└── tests/
-    └── Feature/            # E2E and Scoring integration test suites
+```text
+GET  /api/v1/training/exercises
+GET  /api/v1/training/body-structures
+POST /api/v1/training/body-structures/{bodyStructure}/learned
+GET  /api/v1/training/sessions
+POST /api/v1/training/sessions
+GET  /api/v1/training/sessions/{session}
+POST /api/v1/training/coach/generate-card
 ```
 
----
+Do not infer an endpoint from client expectations or conventional Laravel naming. Inspect `routes/api.php`.
 
-## 🔒 Security & Youth Safety Mandates
+## Authentication boundary
 
-1. **No Public Search Indexing:** Minor profiles, player identity pages, and share cards are protected by `noindex, nofollow` directives and tokenized links.
-2. **Context-Permissioned Authority:** Game scoring permissions require `team_admin`, `coach`, or `scorekeeper` roles verified server-side.
-3. **Auditability:** All corrections, finalized games, historical uploads, and identity merges generate permanent audit records in `audit_logs` and `player_identity_merges`.
+Browser authentication and API authentication are separate.
 
----
+`routes/auth.php` provides the browser session login route at `/login`. The API route table does not currently define `/api/v1/auth/login`.
 
-## 📄 Documentation Index
+Any token-issuance endpoint must therefore be an explicit API decision.
 
-- [`ARCHITECTURE.md`](ARCHITECTURE.md) — Technical Architecture & Non-Negotiable Decision Records
-- [`final-launch-readiness-checklist.md`](final-launch-readiness-checklist.md) — Pre-deployment Environment & Security Checklist
+## Database discipline
+
+Before querying a column, inspect the current migration chain and confirm the column exists in the current schema. Add a new migration for schema changes and never rewrite an already-applied migration.
+
+## Documentation
+
+Read [ARCHITECTURE.md](ARCHITECTURE.md) before structural changes and [AGENTS.md](AGENTS.md) before agent-driven changes.
