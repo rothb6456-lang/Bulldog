@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             BodyStructureSeeder::class,
             ExerciseSeeder::class,
             ExerciseNameMapSeeder::class,
+            FreeExerciseDbBackfillSeeder::class,
         ]);
     }
 }

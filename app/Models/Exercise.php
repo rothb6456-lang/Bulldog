@@ -39,6 +39,7 @@ class Exercise extends Model
     public function bodyStructures(): BelongsToMany
     {
         return $this->belongsToMany(BodyStructure::class, 'exercise_body_structures')
+            ->using(ExerciseBodyStructure::class)
             ->withPivot('role')
             ->withTimestamps();
     }

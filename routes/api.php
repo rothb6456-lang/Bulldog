@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\Training\ExerciseController;
+use App\Http\Controllers\Api\V1\Auth\TokenAuthController;
 use App\Http\Controllers\Api\Imports\HistoricalImportApiController;
 use App\Http\Controllers\Api\Scoring\GameEventController;
 use App\Http\Controllers\Api\Teams\RosterController;
@@ -9,6 +10,9 @@ use App\Http\Controllers\Api\V1\Training\BodyStructureController;
 use App\Http\Controllers\Api\V1\Training\CoachController;
 use App\Http\Controllers\Api\V1\Training\TrainingSessionController;
 use Illuminate\Support\Facades\Route;
+
+Route::post('/v1/auth/login', [TokenAuthController::class, 'login'])
+    ->middleware('throttle:5,1');
 
 Route::middleware('auth:sanctum')->group(function () {
     // Team management endpoints
