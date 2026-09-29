@@ -53,19 +53,6 @@ class BodyStructureController extends Controller
 
     private function resolvePlayerIdentity(Request $request): PlayerIdentity
     {
-        $user = $request->user();
-        $playerIdentity = PlayerIdentity::where('user_id', $user->id)->first();
-
-        if (!$playerIdentity) {
-            $playerIdentity = PlayerIdentity::create([
-                'id' => (string) Str::uuid(),
-                'player_code' => 'PLR-' . strtoupper(Str::random(8)),
-                'user_id' => $user->id,
-                'claim_status' => 'claimed',
-                'display_name' => $user->name ?? explode('@', $user->email)[0],
-            ]);
-        }
-
-        return $playerIdentity;
+        return app(\App\Actions\Training\ResolveTrainingIdentity::class)->execute($request->user());
     }
 }

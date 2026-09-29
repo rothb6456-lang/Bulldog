@@ -23,7 +23,7 @@ class TokenAuthController extends Controller
 
         $user = User::where('email', $validated['email'])->first();
 
-        if (! $user || ! Hash::check($validated['password'], $user->password)) {
+        if (! $user || $user->status !== 'active' || $user->is_minor || ! Hash::check($validated['password'], $user->password)) {
             return response()->json([
                 'message' => 'Invalid email or password.',
             ], 422);
@@ -31,6 +31,6 @@ class TokenAuthController extends Controller
 
         $token = $user->createToken($validated['device_name'] ?? 'unknown-device')->plainTextToken;
 
-        return response()->json(['token' => $token]);
+        return response()->json(['token' => $token, 'user' => ['id' => $user->id, 'name' => $user->name]])->header('Cache-Control', 'no-store');
     }
 }

@@ -1,6 +1,7 @@
 <x-guest-layout>
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
+    <p class="mb-4 text-sm">New to Bulldog? <a class="underline" href="{{ route('register') }}">Create your adult account</a></p>
 
     <form method="POST" action="{{ route('login') }}">
         @csrf

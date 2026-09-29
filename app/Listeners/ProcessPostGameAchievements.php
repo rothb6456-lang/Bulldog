@@ -30,6 +30,11 @@ class ProcessPostGameAchievements
     public function handle(GameFinalized $event): void
     {
         $game = $event->game;
+        if ($game->is_demo) { return; }
+
+        foreach (\App\Models\GamePlayerStat::where('game_id', $game->id)->distinct()->pluck('player_identity_id') as $playerId) {
+            app(\App\Actions\History\RecompilePlayerHistoryAction::class)->execute($playerId);
+        }
 
         try {
             // Sequence of evaluation tasks [100]

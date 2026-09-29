@@ -48,14 +48,17 @@ class ShareLinkController extends Controller
 
         if ($share->object_type === 'player_card') {
             $player = PlayerIdentity::findOrFail($share->object_id);
+            // Existing links must not expose unclaimed youth identities.
+            abort_unless($player->user && ! $player->user->is_minor, 404);
+            if ($share->allow_authenticated_only) { abort_unless(Auth::check(), 403); }
 
             // Load player profile metadata and stats
-            $player->load(['memberships.team', 'profile']);
+            $player->load(['memberships.team']);
 
             // Extract stats
             $careerStats = DB::table('career_aggregates')
-                ->where('scope_type', 'player')
-                ->where('scope_id', $player->id)
+                ->where('subject_type', 'player')
+                ->where('subject_id', $player->id)
                 ->pluck('stat_value', 'stat_key')
                 ->toArray();
 

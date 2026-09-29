@@ -1,2 +1,6 @@
 User-agent: *
-Disallow:
+Disallow: /players/
+Disallow: /sharing/
+Disallow: /shared/
+Disallow: /guardians/
+Disallow: /teams/

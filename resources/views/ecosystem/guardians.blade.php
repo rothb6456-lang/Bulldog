@@ -1,0 +1,6 @@
+@extends('layouts.ecosystem')
+@section('title', 'Guardian invitations')
+@section('content')
+<div class="eyebrow">Private by design</div><h1>Guardian invitations.</h1><p>Your verified email connects you to invitations. Accepting does not grant access until a team administrator confirms the relationship.</p>
+@forelse($relationships as $relationship)<section class="panel"><h2>{{ $relationship->team->name }}</h2><p>Status: <strong>{{ $relationship->verification_status }}</strong></p>@if($relationship->verification_status === 'invited' && $relationship->expires_at->isFuture())<form method="post" action="{{ route('guardians.accept', $relationship) }}">@csrf<p>Accept only if you are this athlete’s parent or authorized guardian.</p><button>Accept guardian invitation</button></form>@elseif($relationship->verification_status === 'verified')<a class="action" href="{{ route('players.show', $relationship->player_identity_id) }}">Open player profile</a>@elseif($relationship->expires_at->isPast() && $relationship->verification_status !== 'verified')<p>This invitation has expired. Ask the team administrator for a new invitation.</p>@endif</section>@empty<section class="panel"><h2>No invitations yet.</h2><p>Ask the team administrator to invite the email you used for this account.</p></section>@endforelse
+@endsection

@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>Bulldog · One account, your whole game</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -18,12 +18,14 @@
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
             <div>
                 <a href="/">
-                    <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
+                    <img src="{{ asset('coach.png') }}" alt="Bulldog" class="w-20 h-20 object-contain mx-auto">
+                    <p class="text-center font-bold mt-3" style="color:#0b2b45">BULLDOG</p>
                 </a>
             </div>
 
             <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
                 {{ $slot }}
+                <p class="text-sm text-gray-600 mt-6">One account for Statbook and Momentum. Built for the next play.</p>
             </div>
         </div>
     </body>

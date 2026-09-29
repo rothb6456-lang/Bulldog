@@ -13,8 +13,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/v1/auth/login', [TokenAuthController::class, 'login'])
     ->middleware('throttle:5,1');
+Route::post('/v1/auth/exchange', [\App\Http\Controllers\Api\V1\Auth\MomentumLaunchController::class, 'exchange'])->middleware('throttle:10,1');
+Route::middleware(['auth:sanctum', \App\Http\Middleware\PrivateWorkspace::class])->get('/v1/auth/me', fn (\Illuminate\Http\Request $request) => response()->json(['user' => ['id' => $request->user()->id, 'name' => $request->user()->name]]));
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', \App\Http\Middleware\PrivateWorkspace::class])->group(function () {
     // Team management endpoints
     Route::post('/teams', [TeamController::class, 'store']);
     Route::get('/teams/{team}', [TeamController::class, 'show']);
@@ -26,8 +28,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/games/{game}/events', [GameEventController::class, 'index']);
 });
 
-Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
+Route::middleware(['auth:sanctum', \App\Http\Middleware\PrivateWorkspace::class])->prefix('v1')->group(function () {
     // Momentum Training Engine Routes
+    Route::post('/training/profile', [\App\Http\Controllers\Api\V1\Training\TrainingProfileController::class, 'store']);
     Route::get('/training/exercises', [ExerciseController::class, 'index']);
     Route::get('/training/body-structures', [BodyStructureController::class, 'index']);
     Route::post('/training/body-structures/{bodyStructure}/learned', [BodyStructureController::class, 'markLearned']);

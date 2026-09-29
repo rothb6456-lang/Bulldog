@@ -16,7 +16,7 @@ class ExerciseController extends Controller
     public function index(): JsonResponse
     {
         $exercises = Exercise::query()
-            ->with(['equipment:id,name,category', 'bodyStructures:id,name,type,region'])
+            ->with(['equipment:id,name,category', 'bodyStructures:id,name,type,region', 'nameMaps:id,exercise_id,original_name'])
             ->orderBy('canonical_name')
             ->get([
                 'id',

@@ -48,6 +48,14 @@ class GameScoringController extends Controller
             ]);
         }
 
-        return view('games.score', compact('game', 'currentState'));
+        $boxScore = \App\Models\GamePlayerStat::where('game_id', $game->id)->with('playerIdentity', 'team')->get()->groupBy('player_identity_id');
+        $events = \App\Models\GameEvent::where('game_id', $game->id)->where('is_voided', false)->orderByDesc('sequence_number')->limit(30)->get();
+        return view('games.score', compact('game', 'currentState', 'boxScore', 'events'));
+    }
+
+    public function store(\App\Http\Requests\Scoring\StoreScoringEventRequest $request, Game $game, \App\Actions\Scoring\RecordScoringEventAction $action)
+    {
+        $action->execute($game->id, $request->validated(), $request->user()->id);
+        return redirect()->route('games.score', $game);
     }
 }

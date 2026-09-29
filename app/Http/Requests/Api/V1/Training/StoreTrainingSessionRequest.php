@@ -14,6 +14,7 @@ class StoreTrainingSessionRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'session_id' => ['nullable', 'string', 'max:100'],
             'player_identity_id' => ['nullable', 'string', 'exists:player_identities,id'],
             'session_date'       => ['required', 'date'],
             'program_day'        => ['nullable', 'integer', 'min:1', 'max:7'],
@@ -36,6 +37,3 @@ class StoreTrainingSessionRequest extends FormRequest
         ];
     }
 }
-^X
-x
-

@@ -39,6 +39,8 @@
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
 
+        <label class="block mt-4"><input type="checkbox" name="adult" value="1" required> I am 18 or older. Youth players are managed privately by coaches and guardians.</label>
+        <x-input-error :messages="$errors->get('adult')" class="mt-2" />
         <div class="flex items-center justify-end mt-4">
             <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
                 {{ __('Already registered?') }}

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.ecosystem')
 
 @section('content')
 <div class="game-workspace" style="--bg: #f3f5f4; --surface: #ffffff; --navy: #081722; --green: #007a43; --green-hover: #00663a; --border: #d7dede; --text-muted: #5f6d78; --blue-accent: #0f6f97; --blue-soft: #e7f2f7;">
@@ -175,7 +175,7 @@
                                 <label style="font-weight: 700; color: var(--navy); min-width: 140px; font-size: 0.95rem;">{{ $posLabel }}</label>
                                 <select name="defense[{{ $posCode }}]" onchange="updateDiamondVisualization('{{ $posCode }}', this.options[this.selectedIndex].text)" style="flex-grow: 1; max-width: 250px; padding: 0.5rem; border: 1px solid var(--border); border-radius: var(--radius-sm, 10px); background: var(--surface);">
                                     <option value="">-- Vacant --</option>
-                                    @foreach($lineupEntries as $player)
+                                    @foreach($lineupEntries->where('team_id', $game->home_team_id) as $player)
                                         <option value="{{ $player->player_identity_id }}" {{ (isset($defensiveAssignments[$posCode]) && $defensiveAssignments[$posCode] == $player->player_identity_id) ? 'selected' : '' }}>
                                             #{{ $player->jersey_number ?? '?' }} - {{ $player->playerIdentity->display_name }}
                                         </option>

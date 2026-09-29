@@ -1,0 +1,7 @@
+@extends('layouts.ecosystem')
+@section('title', 'Statbook')
+@section('content')
+<section class="hero"><div class="eyebrow">Statbook / Your workspace</div><h1>Make every<br>game count.</h1><p>Start with your team. Or take the scorebook for a spin with fictional players and a practice opponent.</p><a class="action" href="{{ route('teams.create') }}">Create a team</a></section>
+<div class="grid"><section class="panel"><h2>Your teams</h2>@forelse($teams as $team)<p><a href="{{ route('teams.show', $team) }}"><strong>{{ $team->name }}</strong></a><br><span class="quiet">{{ $team->sport->name }} · {{ $team->memberships_count }} roster slots{{ $team->status === 'demo' ? ' · Practice only' : '' }}</span></p>@empty<p>No teams yet. Create one to invite players and plan your first game.</p>@endforelse</section>
+<section class="panel"><span class="badge">PRIVATE PRACTICE</span><h2 style="margin-top:16px">Learn by playing.</h2><p>Two fictional rosters, one real scorebook. Try hits, walks, innings, and the box score. No real stats or XP are affected.</p><form method="post" action="{{ route('games.demo') }}">@csrf<label for="sport">Practice sport</label><select id="sport" name="sport_id">@foreach(\App\Models\Sport::whereIn('code',['baseball','softball'])->get() as $sport)<option value="{{ $sport->id }}">{{ $sport->name }}</option>@endforeach</select><button style="margin-top:16px">Start guided practice →</button></form></section></div>
+@endsection

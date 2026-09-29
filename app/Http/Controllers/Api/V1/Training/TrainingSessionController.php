@@ -44,7 +44,13 @@ class TrainingSessionController extends Controller
             ->first();
 
         $session = DB::transaction(function () use ($validated, $playerIdentity, $phase) {
+            PlayerIdentity::whereKey($playerIdentity->id)->lockForUpdate()->firstOrFail();
+            if (! empty($validated['session_id'])) {
+                $existing = TrainingSession::where('player_identity_id', $playerIdentity->id)->where('client_session_id', $validated['session_id'])->first();
+                if ($existing) { return $existing->load(['sets.exercise', 'phase']); }
+            }
             $session = TrainingSession::create([
+                'client_session_id' => $validated['session_id'] ?? null,
                 'id'                 => (string) Str::uuid(),
                 'phase_id'           => $phase?->id,
                 'player_identity_id' => $playerIdentity->id,
@@ -76,6 +82,7 @@ class TrainingSessionController extends Controller
                 $this->evaluatePersonalRecord($playerIdentity, $session, $exercise, $set);
             }
 
+            app(\App\Actions\Training\AwardWeeklyConsistency::class)->execute($session);
             return $session->load(['sets.exercise', 'phase']);
         });
 
@@ -93,7 +100,7 @@ class TrainingSessionController extends Controller
 
     public function show(TrainingSession $session): JsonResponse
     {
-        $this->authorize('view', $session);
+        abort_unless($session->playerIdentity->user_id === request()->user()->id, 403);
         return response()->json([
             'status' => 'success',
             'data'   => $session->load(['sets.exercise', 'phase', 'playerIdentity']),
@@ -103,23 +110,10 @@ class TrainingSessionController extends Controller
     private function resolvePlayerIdentity(Request $request, ?string $explicitId = null): PlayerIdentity
     {
         if ($explicitId) {
-            return PlayerIdentity::findOrFail($explicitId);
+            return PlayerIdentity::where('user_id', $request->user()->id)->findOrFail($explicitId);
         }
 
-        $user = $request->user();
-        $playerIdentity = PlayerIdentity::where('user_id', $user->id)->first();
-
-        if (!$playerIdentity) {
-            $playerIdentity = PlayerIdentity::create([
-                'id'           => (string) Str::uuid(),
-                'player_code'  => 'PLR-' . strtoupper(Str::random(8)),
-                'user_id'      => $user->id,
-                'claim_status' => 'claimed',
-                'display_name' => $user->name ?? explode('@', $user->email)[0],
-            ]);
-        }
-
-        return $playerIdentity;
+        return app(\App\Actions\Training\ResolveTrainingIdentity::class)->execute($request->user());
     }
 
     /**
