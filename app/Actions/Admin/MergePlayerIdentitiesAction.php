@@ -273,59 +273,6 @@ class MergePlayerIdentitiesAction
      */
     protected function rebuildPlayerAggregates(string $playerId): void
     {
-        // 1. Clear cached aggregate views for this player
-        SeasonAggregate::where('subject_type', 'player')->where('subject_id', $playerId)->delete();
-        CareerAggregate::where('subject_type', 'player')->where('subject_id', $playerId)->delete();
-
-        // 2. Aggregate from live game statistics caches
-        $liveStats = GamePlayerStat::where('player_identity_id', $playerId)
-            ->select('stat_key', DB::raw('SUM(stat_value) as total_val'))
-            ->groupBy('stat_key')
-            ->get();
-
-        foreach ($liveStats as $stat) {
-            CareerAggregate::create([
-                'scope_type' => 'player',
-                'scope_id' => $playerId,
-                'stat_key' => $stat->stat_key,
-                'stat_value' => $stat->total_val,
-                'official_status' => 'official',
-            ]);
-        }
-
-        // 3. Aggregate from historical CSV imported files [76, 115, 142]
-        $importedLines = ImportedStatLine::where('subject_type', 'player')
-            ->where('subject_id', $playerId)
-            ->get();
-
-        foreach ($importedLines as $line) {
-            $seasonKey = $line->season_key;
-            $stats = $line->stat_blob_json; // Decoded array
-
-            foreach ($stats as $key => $value) {
-                if (is_numeric($value)) {
-                    // Accumulate Season aggregates
-                    $seasonAgg = SeasonAggregate::firstOrNew([
-                        'scope_type' => 'player',
-                        'scope_id' => $playerId,
-                        'season_key' => $seasonKey,
-                        'stat_key' => $key,
-                    ]);
-                    $seasonAgg->stat_value = ($seasonAgg->stat_value ?? 0.0) + $value;
-                    $seasonAgg->official_status = 'official';
-                    $seasonAgg->save();
-
-                    // Accumulate Career aggregates
-                    $careerAgg = CareerAggregate::firstOrNew([
-                        'scope_type' => 'player',
-                        'scope_id' => $playerId,
-                        'stat_key' => $key,
-                    ]);
-                    $careerAgg->stat_value = ($careerAgg->stat_value ?? 0.0) + $value;
-                    $careerAgg->official_status = 'official';
-                    $careerAgg->save();
-                }
-            }
-        }
+        app(\App\Actions\History\RecompilePlayerHistoryAction::class)->execute($playerId);
     }
 }

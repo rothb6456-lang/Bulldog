@@ -26,6 +26,13 @@ class AddRosterPlayerAction
         return DB::transaction(function () use ($teamId, $data, $creatorUserId) {
             $playerIdentityId = $data['player_identity_id'] ?? null;
 
+            if ($playerIdentityId) {
+                \Illuminate\Support\Facades\Gate::forUser(\App\Models\User::findOrFail($creatorUserId))
+                    ->authorize('view', PlayerIdentity::findOrFail($playerIdentityId));
+                $existing = TeamMembership::where('team_id', $teamId)->where('player_identity_id', $playerIdentityId)->first();
+                if ($existing) { return $existing; }
+            }
+
             // Pathway B: If no existing player is selected, create a new unclaimed PlayerIdentity
             if (!$playerIdentityId) {
                 $playerCode = $this->codeGenerator->generatePlayerCode();

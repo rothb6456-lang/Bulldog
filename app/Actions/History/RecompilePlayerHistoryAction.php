@@ -28,12 +28,13 @@ class RecompilePlayerHistoryAction
 
             // 2. Fetch authoritative live game statistics (e.g., from Live scoring engine) [141]
             $liveStats = GamePlayerStat::where('player_identity_id', $playerIdentityId)
+                ->whereHas('game', fn ($q) => $q->where('is_demo', false)->where('status', 'finalized'))
                 ->with(['game'])
                 ->get();
 
             foreach ($liveStats as $stat) {
                 // Determine season context dynamically (using season_label from associated Team context or fallback) [65]
-                $season = $stat->game->season_label ?? 'Spring 2026';
+                $season = $stat->team?->season_label ?: (string) $stat->game->scheduled_at->year;
                 $key = $stat->stat_key;
                 $val = (float)$stat->stat_value;
 
@@ -102,7 +103,7 @@ class RecompilePlayerHistoryAction
 
         if (!isset($compiled[$scopeKey][$statKey])) {
             $compiled[$scopeKey][$statKey] = [
-                'value' => 0.0,
+                'value' => $value,
                 'source_type' => $sourceType,
                 'fidelity' => $fidelity,
             ];

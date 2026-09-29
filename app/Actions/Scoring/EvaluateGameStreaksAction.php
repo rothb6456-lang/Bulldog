@@ -11,6 +11,7 @@ class EvaluateGameStreaksAction
 {
     public function execute(Game $game): void
     {
+        if ($game->is_demo) { return; }
         DB::transaction(function () use ($game) {
             // Fetch all players who registered at least one Plate Appearance (PA) in this game
             $participants = GamePlayerStat::where('game_id', $game->id)

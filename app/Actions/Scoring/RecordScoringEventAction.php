@@ -22,7 +22,8 @@ class RecordScoringEventAction
     public function execute(string $gameId, array $data, string $userId): GameEvent
     {
         return DB::transaction(function () use ($gameId, $data, $userId) {
-            $game = Game::findOrFail($gameId);
+            $game = Game::lockForUpdate()->findOrFail($gameId);
+            abort_if($game->status === 'finalized', 422, 'This game is finalized.');
 
             // 1. Fetch latest state snapshot to get baseline tracking
             $latestSnapshot = GameStateSnapshot::where('game_id', $gameId)
@@ -41,6 +42,8 @@ class RecordScoringEventAction
 
             $inning = $latestSnapshot ? $latestSnapshot->inning_number : 1;
             $halfInning = $latestSnapshot ? $latestSnapshot->half_inning : 'top';
+            $eventInning = $inning;
+            $eventHalf = $halfInning;
 
             // 2. Resolve on-field events and update counts
             $ballsAfter = $ballsBefore;
@@ -59,16 +62,17 @@ class RecordScoringEventAction
                 } else if ($pitchResult === 'ball') {
                     $ballsAfter++;
                 }
-            } else if ($type === 'single') {
+            } else if (in_array($type, ['single', 'double', 'triple', 'home_run'])) {
                 // Single: Empty count, place runner on 1st, advance others
                 $ballsAfter = 0;
                 $strikesAfter = 0;
-                $baseStateAfter = $this->advanceRunners($baseStateBefore, 1, $homeScoreAfter, $awayScoreAfter, $halfInning);
+                $bases = ['single' => 1, 'double' => 2, 'triple' => 3, 'home_run' => 4][$type];
+                $baseStateAfter = $this->advanceRunners($baseStateBefore, $bases, $homeScoreAfter, $awayScoreAfter, $halfInning);
             } else if ($type === 'walk') {
                 $ballsAfter = 0;
                 $strikesAfter = 0;
                 $baseStateAfter = $this->advanceRunners($baseStateBefore, 1, $homeScoreAfter, $awayScoreAfter, $halfInning, true);
-            } else if ($type === 'strikeout') {
+            } else if (in_array($type, ['strikeout', 'out'])) {
                 $ballsAfter = 0;
                 $strikesAfter = 0;
                 $outsAfter++;
@@ -95,8 +99,8 @@ class RecordScoringEventAction
                 'sequence_number' => $nextSequence,
                 'event_family' => $data['event_family'],
                 'event_type' => $type,
-                'inning_number' => $inning,
-                'half_inning' => $halfInning,
+                'inning_number' => $eventInning,
+                'half_inning' => $eventHalf,
                 'outs_before' => $outsBefore,
                 'outs_after' => $outsAfter,
                 'balls_before' => $ballsBefore,

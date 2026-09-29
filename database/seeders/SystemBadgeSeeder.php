@@ -12,6 +12,10 @@ class SystemBadgeSeeder extends Seeder
      */
     public function run(): void
     {
+        AchievementDefinition::updateOrCreate(['code' => 'WEEKLY_CONSISTENCY'], [
+            'name' => 'Showed Up', 'description' => 'Completed the planned training sessions for a week.',
+            'category' => 'consistency', 'rule_json' => ['trigger' => 'sessions_per_week'], 'xp_value' => 25, 'is_repeatable' => true,
+        ]);
         AchievementDefinition::updateOrCreate(
             ['code' => 'ACE_IN_HOLE'],
             [

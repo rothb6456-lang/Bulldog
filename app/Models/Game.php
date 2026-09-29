@@ -27,6 +27,7 @@ class Game extends Model
 
     protected $fillable = [
         'game_code',
+        'is_demo',
         'sport_id',
         'home_team_id',
         'away_team_id',
@@ -41,6 +42,7 @@ class Game extends Model
     ];
 
     protected $casts = [
+        'is_demo' => 'boolean',
         'scheduled_at' => 'datetime',
         'finalized_at' => 'datetime',
     ];
@@ -83,6 +85,11 @@ class Game extends Model
     public function rosterEntries(): HasMany
     {
         return $this->hasMany(GameRosterEntry::class);
+    }
+
+    public function gameRosterEntries(): HasMany
+    {
+        return $this->rosterEntries();
     }
 
     /**

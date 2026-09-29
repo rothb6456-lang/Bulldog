@@ -13,6 +13,7 @@ class TrainingSession extends Model
     use HasFactory, HasUuids;
 
     protected $fillable = [
+        'client_session_id',
         'player_identity_id',
         'phase_id',
         'session_date',

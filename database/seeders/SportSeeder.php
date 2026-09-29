@@ -13,7 +13,7 @@ class SportSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('sports')->insert([
+        $rows = [
             [
                 'id' => Str::uuid()->toString(),
                 'code' => 'baseball',
@@ -28,6 +28,9 @@ class SportSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-        ]);
+        ];
+        foreach ($rows as $row) {
+            \App\Models\Sport::updateOrCreate(['code' => $row['code']], ['name' => $row['name']]);
+        }
     }
 }

@@ -29,6 +29,11 @@ class RecalculateGameStatsAction
                 ->orderBy('sequence_number', 'asc')
                 ->get();
 
+            $rosterTeams = $game->rosterEntries()->pluck('team_id', 'player_identity_id');
+            // Legacy games created before roster snapshots still need attribution.
+            if ($rosterTeams->isEmpty()) {
+                $rosterTeams = \App\Models\TeamMembership::whereIn('team_id', [$game->home_team_id, $game->away_team_id])->pluck('team_id', 'player_identity_id');
+            }
             $playerStats = [];
             $teamStats = [];
 
@@ -40,45 +45,50 @@ class RecalculateGameStatsAction
                 $batter = $event->eventPlayers->firstWhere('role', 'batter');
                 $pitcher = $event->eventPlayers->firstWhere('role', 'pitcher');
 
-                if ($type === 'single') {
+                $battingTeam = $batter ? ($rosterTeams[$batter->player_identity_id] ?? ($event->half_inning === 'top' ? $game->away_team_id : $game->home_team_id)) : $game->home_team_id;
+                $pitchingTeam = $pitcher ? ($rosterTeams[$pitcher->player_identity_id] ?? ($event->half_inning === 'top' ? $game->home_team_id : $game->away_team_id)) : $game->away_team_id;
+                if (in_array($type, ['single', 'double', 'triple', 'home_run'])) {
                     if ($batter) {
-                        $this->increment($playerStats, $gameId, $batter->player_identity_id, $game->home_team_id, 'AB', 1);
-                        $this->increment($playerStats, $gameId, $batter->player_identity_id, $game->home_team_id, 'H', 1);
-                        $this->increment($playerStats, $gameId, $batter->player_identity_id, $game->home_team_id, 'PA', 1);
+                        $this->increment($playerStats, $gameId, $batter->player_identity_id, $battingTeam, 'AB', 1);
+                        $this->increment($playerStats, $gameId, $batter->player_identity_id, $battingTeam, 'H', 1);
+                        $this->increment($playerStats, $gameId, $batter->player_identity_id, $battingTeam, 'PA', 1);
                     }
                     if ($pitcher) {
-                        $this->increment($playerStats, $gameId, $pitcher->player_identity_id, $game->away_team_id, 'H_allowed', 1);
-                        $this->increment($playerStats, $gameId, $pitcher->player_identity_id, $game->away_team_id, 'BF', 1);
+                        $this->increment($playerStats, $gameId, $pitcher->player_identity_id, $pitchingTeam, 'H_allowed', 1);
+                        $this->increment($playerStats, $gameId, $pitcher->player_identity_id, $pitchingTeam, 'BF', 1);
+                    }
+                    if ($batter && $type !== 'single') {
+                        $this->increment($playerStats, $gameId, $batter->player_identity_id, $battingTeam, ['double' => '2B', 'triple' => '3B', 'home_run' => 'HR'][$type], 1);
                     }
                 } else if ($type === 'walk') {
                     if ($batter) {
-                        $this->increment($playerStats, $gameId, $batter->player_identity_id, $game->home_team_id, 'BB', 1);
-                        $this->increment($playerStats, $gameId, $batter->player_identity_id, $game->home_team_id, 'PA', 1);
+                        $this->increment($playerStats, $gameId, $batter->player_identity_id, $battingTeam, 'BB', 1);
+                        $this->increment($playerStats, $gameId, $batter->player_identity_id, $battingTeam, 'PA', 1);
                     }
                     if ($pitcher) {
-                        $this->increment($playerStats, $gameId, $pitcher->player_identity_id, $game->away_team_id, 'BB_allowed', 1);
-                        $this->increment($playerStats, $gameId, $pitcher->player_identity_id, $game->away_team_id, 'BF', 1);
+                        $this->increment($playerStats, $gameId, $pitcher->player_identity_id, $pitchingTeam, 'BB_allowed', 1);
+                        $this->increment($playerStats, $gameId, $pitcher->player_identity_id, $pitchingTeam, 'BF', 1);
                     }
-                } else if ($type === 'strikeout') {
+                } else if (in_array($type, ['strikeout', 'out'])) {
                     if ($batter) {
-                        $this->increment($playerStats, $gameId, $batter->player_identity_id, $game->home_team_id, 'AB', 1);
-                        $this->increment($playerStats, $gameId, $batter->player_identity_id, $game->home_team_id, 'SO', 1);
-                        $this->increment($playerStats, $gameId, $batter->player_identity_id, $game->home_team_id, 'PA', 1);
+                        $this->increment($playerStats, $gameId, $batter->player_identity_id, $battingTeam, 'AB', 1);
+                        if ($type === 'strikeout') { $this->increment($playerStats, $gameId, $batter->player_identity_id, $battingTeam, 'SO', 1); }
+                        $this->increment($playerStats, $gameId, $batter->player_identity_id, $battingTeam, 'PA', 1);
                     }
                     if ($pitcher) {
-                        $this->increment($playerStats, $gameId, $pitcher->player_identity_id, $game->away_team_id, 'SO_pitching', 1);
-                        $this->increment($playerStats, $gameId, $pitcher->player_identity_id, $game->away_team_id, 'IP_outs', 1);
-                        $this->increment($playerStats, $gameId, $pitcher->player_identity_id, $game->away_team_id, 'BF', 1);
+                        if ($type === 'strikeout') { $this->increment($playerStats, $gameId, $pitcher->player_identity_id, $pitchingTeam, 'SO_pitching', 1); }
+                        $this->increment($playerStats, $gameId, $pitcher->player_identity_id, $pitchingTeam, 'IP_outs', 1);
+                        $this->increment($playerStats, $gameId, $pitcher->player_identity_id, $pitchingTeam, 'BF', 1);
                     }
                 } else if ($type === 'pitch') {
                     if ($pitcher) {
                         $pitchResult = $event->payload_json['pitch_result'] ?? 'ball';
                         if ($pitchResult === 'strike') {
-                            $this->increment($playerStats, $gameId, $pitcher->player_identity_id, $game->away_team_id, 'strikes_thrown', 1);
+                            $this->increment($playerStats, $gameId, $pitcher->player_identity_id, $pitchingTeam, 'strikes_thrown', 1);
                         } else {
-                            $this->increment($playerStats, $gameId, $pitcher->player_identity_id, $game->away_team_id, 'balls_thrown', 1);
+                            $this->increment($playerStats, $gameId, $pitcher->player_identity_id, $pitchingTeam, 'balls_thrown', 1);
                         }
-                        $this->increment($playerStats, $gameId, $pitcher->player_identity_id, $game->away_team_id, 'total_pitches', 1);
+                        $this->increment($playerStats, $gameId, $pitcher->player_identity_id, $pitchingTeam, 'total_pitches', 1);
                     }
                 }
             }

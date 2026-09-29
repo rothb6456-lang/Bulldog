@@ -42,6 +42,12 @@ class CreateTeamAction
                 'granted_by_user_id' => $creatorUserId,
             ]);
 
+            $team->roleAssignments()->create([
+                'user_id' => $creatorUserId,
+                'role_type' => 'coach',
+                'granted_by_user_id' => $creatorUserId,
+            ]);
+
             return $team;
         });
     }

@@ -15,6 +15,7 @@ class AwardSystemAchievementsAction
 {
     public function execute(Game $game): void
     {
+        if ($game->is_demo) { return; }
         DB::transaction(function () use ($game) {
             // Find game players with 10+ strikeouts on the mound
             $pitchers = GamePlayerStat::where('game_id', $game->id)

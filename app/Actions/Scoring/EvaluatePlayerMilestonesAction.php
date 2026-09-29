@@ -18,6 +18,7 @@ class EvaluatePlayerMilestonesAction
 
     public function execute(Game $game): void
     {
+        if ($game->is_demo) { return; }
         DB::transaction(function () use ($game) {
             $boxStats = GamePlayerStat::where('game_id', $game->id)->get();
 
@@ -30,8 +31,8 @@ class EvaluatePlayerMilestonesAction
                 }
 
                 // Query current total aggregate
-                $totalValue = CareerAggregate::where('scope_type', 'player')
-                    ->where('scope_id', $playerId)
+                $totalValue = CareerAggregate::where('subject_type', 'player')
+                    ->where('subject_id', $playerId)
                     ->where('stat_key', $key)
                     ->value('stat_value') ?? 0.00;
 

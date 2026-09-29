@@ -22,7 +22,7 @@ class RulesetSeeder extends Seeder
             return;
         }
 
-        DB::table('rulesets')->insert([
+        $rows = [
             // 1. Little League Baseball Ruleset
             [
                 'id' => Str::uuid()->toString(),
@@ -136,6 +136,9 @@ class RulesetSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ]
-        ]);
+        ];
+        foreach ($rows as $row) {
+            \App\Models\Ruleset::updateOrCreate(['sport_id' => $row['sport_id'], 'name' => $row['name']], ['config_json' => json_decode($row['config_json'], true)]);
+        }
     }
 }

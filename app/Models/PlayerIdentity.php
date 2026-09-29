@@ -25,6 +25,11 @@ class PlayerIdentity extends Model
         'created_by_user_id',
     ];
 
+    public function memberships(): HasMany
+    {
+        return $this->hasMany(TeamMembership::class);
+    }
+
     /**
      * Get the claimed user account linked to this identity, if any.
      */
