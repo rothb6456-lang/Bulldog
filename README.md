@@ -116,7 +116,9 @@ Do not infer an endpoint from client expectations or conventional Laravel naming
 
 Browser authentication and API authentication are separate.
 
-`routes/auth.php` provides the browser session login route at `/login`. The API route table does not currently define `/api/v1/auth/login`.
+`routes/auth.php` provides browser session login at `/login`. `POST /api/v1/auth/login` issues a Sanctum token for Momentum. Verified adults can also use `POST /momentum/launch`: a hashed, single-use code expires after 90 seconds and is exchanged at `POST /api/v1/auth/exchange`. Passwords and bearer tokens are never placed in launch URLs.
+
+The beta hub is `/dashboard`; team/roster work lives under `/teams`, guardian invitations under `/guardians`, and informational previews at `/nutrition` and `/merch`. Practice games use the real scoring pipeline with fictional players and are excluded from career/season history and awards. See `BETA-RELEASE.md` for verification and deployment boundaries.
 
 Any token-issuance endpoint must therefore be an explicit API decision.
 

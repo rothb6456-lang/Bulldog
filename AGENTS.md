@@ -51,7 +51,7 @@ Momentum is a local-first vanilla JS PWA with no build step. It must remain usef
 
 ### 1. Invalid Momentum login endpoint
 
-Momentum previously called `POST /api/v1/auth/login`. That endpoint is not currently defined by Bulldog's API route table. The browser `/login` route is a different authentication surface.
+`POST /api/v1/auth/login` now exists. The browser `/login` route remains a separate session surface. Verify `routes/api.php` before changing the token login or one-use launch-code exchange contracts.
 
 ### 2. bindLog() scope regression
 

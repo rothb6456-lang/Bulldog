@@ -64,7 +64,7 @@ Core gym-floor operation must remain usable without the API.
 
 ## 5. Authentication boundary
 
-There are two distinct surfaces: Laravel browser session authentication, including `/login`, and Sanctum-protected versioned API requests. The current API route table does not define `/api/v1/auth/login`. Token issuance cannot be inferred from the existence of Sanctum.
+Browser sessions use `/login`; Momentum uses Sanctum tokens from `/api/v1/auth/login` or the one-use `/api/v1/auth/exchange` bridge. The bridge uses an expiring URL fragment code, removes it immediately in Momentum, and exchanges it without replaying a password. CORS permits the configured Momentum origin only.
 
 ## 6. Migration discipline
 
@@ -109,6 +109,15 @@ Experience, goals, equipment, and guardrails are structured training concepts ra
 Coach card generation is exposed through Bulldog rather than requiring backend credentials in Momentum.
 
 ## 8. Deployment boundary
+
+### ADR-013: Adult accounts and confirmed guardian access
+The beta accepts active adult accounts. Youth identities remain private and unclaimed. An invited guardian verifies their own account, accepts an invitation, and receives access only after a different authorized team administrator confirms. Training is visible to its owner or verified guardian, rather than every roster manager.
+
+### ADR-014: Practice isolation and retry-safe training
+Practice games set `is_demo`; real scoring projections are retained for the practice box score, while season/career compilation and achievement triggers exclude practice. Training uses PlayerIdentity UUIDs and a unique player/client-session key to make repeated uploads idempotent.
+
+### ADR-015: Separate local workspaces per account
+Momentum archives each account's local workspace when switching accounts and restores it only for that account. Catalog metadata is shared; tokens are not archived. Unknown exercise metadata never qualifies a card as bodyweight-only.
 
 ```text
 bulldogstats.com
