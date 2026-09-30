@@ -7,10 +7,11 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::table('games', function (Blueprint $table) {
+        // MySQL DDL is not transactional; resume safely after a partial failure.
+        if (! Schema::hasColumn('games', 'is_demo')) Schema::table('games', function (Blueprint $table) {
             $table->boolean('is_demo')->default(false)->index();
         });
-        Schema::create('guardian_relationships', function (Blueprint $table) {
+        if (! Schema::hasTable('guardian_relationships')) Schema::create('guardian_relationships', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('player_identity_id')->constrained()->cascadeOnDelete();
             $table->foreignUuid('team_id')->constrained()->cascadeOnDelete();
@@ -24,9 +25,13 @@ return new class extends Migration {
             $table->timestamp('expires_at');
             $table->timestamps();
             $table->unique(['player_identity_id', 'invited_email']);
-            $table->index(['guardian_user_id', 'verification_status']);
         });
-        Schema::create('momentum_launch_codes', function (Blueprint $table) {
+        if (! Schema::hasIndex('guardian_relationships', ['guardian_user_id', 'verification_status'])) {
+            Schema::table('guardian_relationships', function (Blueprint $table) {
+                $table->index(['guardian_user_id', 'verification_status'], 'guardian_access_index');
+            });
+        }
+        if (! Schema::hasTable('momentum_launch_codes')) Schema::create('momentum_launch_codes', function (Blueprint $table) {
             $table->string('code_hash', 64)->primary();
             $table->foreignUuid('user_id')->constrained()->cascadeOnDelete();
             $table->timestamp('expires_at');
