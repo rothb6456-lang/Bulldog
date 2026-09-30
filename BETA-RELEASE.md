@@ -1,6 +1,12 @@
 # Ecosystem beta release
 
-## Status: local validation complete; production deployment pending
+## Status: deployed; live account acceptance testing in progress
+
+Laravel is active at `/home/dh_hf2733/releases/statbook-beta-20260929`, through the existing `bulldogstats.com/statbook` symlink. Backend commit `01711a0` is on GitHub. Momentum commit `f0beb08` is on main and its new bridge asset returns HTTP 200 publicly. Marketing Launch App links and Statbook links are live. Root Laravel redirects to login (302), and login returns 200. A real visitor registered and reached email verification; delivery remains blocked by the existing log-only mail transport.
+
+The approved MySQL migration initially stopped on an automatically generated index name longer than 64 characters. The user approved a narrow repair to that failed migration: a short `guardian_access_index` name and guards for already-applied additions. The repaired migration and all three targeted seeders completed. The full local suite passed again (46 tests, 202 assertions). No legacy catalog rows were removed.
+
+Recovery: previous application `/home/dh_hf2733/bulldogstats.com/statbook-release-d8961e6`; completed database dump `/home/dh_hf2733/private-backups/statbook-before-beta-20260930-003752.sql` (265480 bytes); marketing backup `/home/dh_hf2733/private-backups/marketing-before-beta-20260930.html`. Storage points to the previous release's physical storage directory, not the switchable application symlink.
 
 The hub connects real team/roster management, private player identities, guardian invitations, Momentum, and non-transactional Nutrition/Merch previews. Guardian access requires invitation acceptance by the matching verified adult and confirmation by a different authorized team administrator. Practice games use fictional rosters and are excluded from history and awards.
 
@@ -14,8 +20,9 @@ Momentum launch exchanges a hashed, single-use 90-second code for an API token. 
 - Momentum JavaScript syntax checks passed; card filter tests (11 assertions), account workspace tests (6 assertions), and parser smoke tests (4 groups) passed.
 - Local browser: hub to Momentum connected without another password, catalog loaded, equipment/body-structure filtering worked, and a queued workout reached Log, Review, and authenticated sync. Database inspection confirmed one session and one set at 25 lb / 8 reps.
 - Local migrations and seeders passed. Local catalog counts are 116 exercises and 6 aliases. Production read-only inspection found 126 exercises and 61 aliases; legacy rows are preserved.
+- Additional browser checks passed: team creation, a fictional private youth roster entry, hit/walk/home-run base advancement, all nine practice innings, and finalization at 3-0. Mobile hub and finalized scorebook screenshots were captured; Nutrition and Merch previews were inspected.
 
-These checks do not establish live deployment or successful delivery of registration emails.
+Local workflow checks do not establish live authenticated behavior or successful delivery of registration emails.
 
 ## Deployment boundaries
 
@@ -29,11 +36,11 @@ These checks do not establish live deployment or successful delivery of registra
 
 ## Remaining acceptance checks
 
-1. Stage, back up, inspect targeted migrations, approve activation, and deploy.
-2. Verify registration and email verification through the public domains, then one-account hub-to-Momentum launch and retry-safe workout sync.
-3. Browser-test team creation, roster linking, guardian accept/confirm/revoke, and a complete guided practice game on desktop and mobile.
+1. Completed: stage, back up, inspect targeted migrations, approve activation, and deploy.
+2. Configure deliverable email and finish real-account email verification, then one-account hub-to-Momentum launch and retry-safe workout sync.
+3. Live browser-test team creation, roster linking, guardian accept/confirm/revoke, and guided practice. Local team/roster/practice checks are complete; automated tests cover guardian authorization.
 4. Verify installed/offline Momentum reopen, service-worker update, account switching, and all five application views on a mobile viewport.
-5. Publish marketing navigation; verify the real new-visitor path and capture final screenshots.
+5. Marketing navigation is published and desktop screenshot captured; complete mobile and authenticated new-visitor checks.
 
 ## Known beta limits and next priorities
 
