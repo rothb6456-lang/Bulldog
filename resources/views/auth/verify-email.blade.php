@@ -3,6 +3,13 @@
         {{ __('Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn\'t receive the email, we will gladly send you another.') }}
     </div>
 
+    <div class="mb-4 text-sm text-gray-600">
+        <p><strong>{{ __('Can’t find your verification email?') }}</strong></p>
+        <p>{{ __('Check your Spam or Junk folder for a message from') }}
+            <strong>{{ config('mail.from.name') }} &lt;{{ config('mail.from.address') }}&gt;</strong>.
+            {{ __('If it’s there, mark it “Not spam.” You can also add this address to your contacts. Still missing? Use “Resend Verification Email” below.') }}</p>
+    </div>
+
     @if (session('status') == 'verification-link-sent')
         <div class="mb-4 font-medium text-sm text-green-600">
             {{ __('A new verification link has been sent to the email address you provided during registration.') }}
